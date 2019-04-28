@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "145149401739",
+    "firebase_url": "https://recycle-scan-77261.firebaseio.com",
+    "project_id": "recycle-scan-77261",
+    "storage_bucket": "recycle-scan-77261.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145149401739:android:d4fa4d1edbde9496",
+        "android_client_info": {
+          "package_name": "com.example.jojo.recyclescan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145149401739-v1d1nemkgeddianoj5oqth2gv9tc4egs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb3m3TRBwfGtbEcOkoKsNP2XSWYBIMD6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145149401739-v1d1nemkgeddianoj5oqth2gv9tc4egs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
