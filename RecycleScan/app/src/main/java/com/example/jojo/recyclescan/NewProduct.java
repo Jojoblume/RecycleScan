@@ -6,17 +6,25 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NewProduct extends AppCompatActivity {
@@ -25,10 +33,9 @@ public class NewProduct extends AppCompatActivity {
     TextView textEAN;
     FloatingActionButton btn_float;
     EditText textBez;
-    EditText text1;
-    EditText text2;
-    EditText text3;
-    Button btn_bes;
+    ListView lv1;
+    public static String[] übergabe = {"","","","",""};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +47,38 @@ public class NewProduct extends AppCompatActivity {
         textEAN.setText(ean);
 
         textBez = findViewById(R.id.editTextBez);
-        text1 = findViewById(R.id.editText1);
-        text2 = findViewById(R.id.editText2);
-        text3 = findViewById(R.id.editText3);
 
-        btn_bes = findViewById(R.id.button2);
-        btn_bes.setOnClickListener(new View.OnClickListener() {
+        lv1 = findViewById(R.id.list1);
+        //TODO: 2. Liste mit Recyclingcodes...
+
+        //Daten
+        GelberSack gelb = new GelberSack();
+        //hier dann glas und Altpapier Liste..
+        GelberSack gelb2 = new GelberSack();
+        ArrayList<String> combined = new ArrayList<>();
+        combined.addAll(gelb.listeGelb);
+        //hier dann glas und Altpapier Liste..
+        combined.addAll(gelb2.listeGelb);
+
+        ArrayAdapter<String> list = new ArrayAdapter<String>(NewProduct.this, android.R.layout.simple_list_item_multiple_choice, combined);
+        lv1.setAdapter(list);
+
+
+        lv1.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-            Intent nextIntent = new Intent(getApplicationContext(), BestandList.class);
-            startActivity(nextIntent);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Verdreht?? isItemChecked...
+                if ( lv1.isItemChecked(position)){
+                    lv1.setItemChecked(position, true);
+
+                }
+                else
+                {
+                    lv1.setItemChecked(position, false);
+
+                }
+
             }
         });
 
@@ -57,33 +86,52 @@ public class NewProduct extends AppCompatActivity {
         btn_float.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String bez = textBez.getText().toString();
-                ArrayList<String> array = getIntent().getStringArrayListExtra("LISTBES");
+                //TODO: Wenn übergabe. size + andere Liste+size >5!!!
+                if(lv1.getCheckedItemCount()>5){
+                    Toast.makeText(getApplicationContext(),  "Max 5 Bestandteile auswählen!", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    String bez = textBez.getText().toString();
+                    int counter = 0;
 
-                Map<String, Object> product = new HashMap<>();
-                product.put("Bezeichnung", bez);
-                product.put("Bestandteil 1", array.get(0));
-                product.put("Bestandteil 2", array.get(1));
-                product.put("Bestandteil 3", array.get(2));
-                product.put("Bestandteil 4", array.get(3));
-                product.put("Bestandteil 5", array.get(4));
+                    SparseBooleanArray checked = lv1.getCheckedItemPositions();
+                    for (int i = 0; i < checked.size(); i++)
+                    {
+                        if (checked.valueAt(i))
+                        {
+                            int pos = checked.keyAt(i);
+                            übergabe[counter] = lv1.getItemAtPosition(pos).toString();
+                            counter++;
+                        }
+                    }
 
-                db.collection("Produkte").document(ean)
-                        .set(product)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(MainActivity.TAG, "DocumentSnapshot successfully written!");
-                                Intent homeIntent = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(homeIntent);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(MainActivity.TAG, "Error writing document", e);
-                            }
-                        });
+                    Map<String, Object> product = new HashMap<>();
+                     product.put("Bezeichnung", bez);
+                     product.put("Bestandteil 1", übergabe[0]);
+                     product.put("Bestandteil 2", übergabe[1]);
+                     product.put("Bestandteil 3", übergabe[2]);
+                     product.put("Bestandteil 4", übergabe[3]);
+                     product.put("Bestandteil 5", übergabe[4]);
+
+                    db.collection("Produkte").document(ean)
+                            .set(product)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(MainActivity.TAG, "DocumentSnapshot successfully written!");
+                                    Intent homeIntent = new Intent(getApplicationContext(), MainActivity.class);
+                                    startActivity(homeIntent);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(MainActivity.TAG, "Error writing document", e);
+                                }
+                            });
+                }
+
 
 
             }

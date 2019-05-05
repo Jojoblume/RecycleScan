@@ -24,6 +24,7 @@ public class BestandList extends AppCompatActivity {
 
     ListView lv;
     FloatingActionButton btn_finish;
+    public static ArrayList<String> übergabe = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,6 @@ public class BestandList extends AppCompatActivity {
         ArrayAdapter<String> list = new ArrayAdapter<String>(BestandList.this, android.R.layout.simple_list_item_multiple_choice, combined);
         lv.setAdapter(list);
 
-        final ArrayList<String> übergabe = new ArrayList<>();
 
         lv.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,7 +79,6 @@ public class BestandList extends AppCompatActivity {
                 {
                     //TODO: Backward Intent or Shared Preference or OnActivity Result...
                     Intent back = new Intent(getApplicationContext(), NewProduct.class);
-                    back.putExtra("LISTBES", übergabe);
                     startActivity(back);
                 }
             }
