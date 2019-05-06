@@ -2,27 +2,14 @@ package com.example.jojo.recyclescan;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
+
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.zxing.integration.android.IntentIntegrator;
-
 import java.util.ArrayList;
 
 
 public class Ergebnis extends AppCompatActivity {
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     TextView textEAN;
     TextView textBez;
     ListView lv;
@@ -49,7 +36,6 @@ public class Ergebnis extends AppCompatActivity {
 
         for ( int i = 0; i < array.size(); i++){
             if ( ! array.get(i).equals("")){
-                //TODO: Zuweisungslogik!
                 drawable = getTonne(array.get(i));
                 newArray.add(new Bestandteil(drawable, array.get(i)));
             }
@@ -61,10 +47,20 @@ public class Ergebnis extends AppCompatActivity {
 
     //Gibt int zurück, da die Images R.drawable.. den Datentyp Integer haben.
     public int getTonne(String bes){
+        //TODO: Zuweisungslogik!
 
+        //TODO: Ggf. Nicht einzeln gelb, glas, papier, sondern in Klasse Bestandteil integrieren.
         GelberSack gelb = new GelberSack();
-        if ( gelb.listeGelb.contains(bes)){
+        Glas glas = new Glas();
+        Altpapier pap = new Altpapier();
+        if ( gelb.listeGelb.contains(bes) || gelb.listeCodeGelb.contains(bes)){
             return gelb.getTonne();
+        }
+        if(glas.listeGlas.contains(bes) || glas.listeCodeGlas.contains(bes)){
+            return glas.getTonne(bes); //weiß, grün oder braun...
+        }
+        if(pap.listePap.contains(bes) || pap.listeCodePap.contains(bes)){
+            return pap.getTonne();
         }
         return -1;
     }

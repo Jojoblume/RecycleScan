@@ -34,6 +34,8 @@ public class NewProduct extends AppCompatActivity {
     FloatingActionButton btn_float;
     EditText textBez;
     ListView lv1;
+    ListView lv2;
+
     public static String[] übergabe = {"","","","",""};
 
 
@@ -49,19 +51,28 @@ public class NewProduct extends AppCompatActivity {
         textBez = findViewById(R.id.editTextBez);
 
         lv1 = findViewById(R.id.list1);
-        //TODO: 2. Liste mit Recyclingcodes...
+        lv2 = findViewById(R.id.list2);
 
         //Daten
         GelberSack gelb = new GelberSack();
-        //hier dann glas und Altpapier Liste..
-        GelberSack gelb2 = new GelberSack();
+        Glas glas = new Glas();
+        Altpapier pap = new Altpapier();
+        //kombinierte Liste der Bestandteile
         ArrayList<String> combined = new ArrayList<>();
         combined.addAll(gelb.listeGelb);
-        //hier dann glas und Altpapier Liste..
-        combined.addAll(gelb2.listeGelb);
+        combined.addAll(glas.listeGlas);
+        combined.addAll(pap.listePap);
 
         ArrayAdapter<String> list = new ArrayAdapter<String>(NewProduct.this, android.R.layout.simple_list_item_multiple_choice, combined);
         lv1.setAdapter(list);
+
+        // Recycling Codes
+        ArrayList<String> combinedCodes = new ArrayList<>();
+        combinedCodes.addAll(gelb.listeCodeGelb);
+        combinedCodes.addAll(glas.listeCodeGlas);
+        combinedCodes.addAll(pap.listeCodePap);
+        ArrayAdapter<String> listCodes = new ArrayAdapter<>(NewProduct.this, android.R.layout.simple_list_item_multiple_choice, combinedCodes);
+        lv2.setAdapter(listCodes);
 
 
         lv1.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
@@ -82,12 +93,28 @@ public class NewProduct extends AppCompatActivity {
             }
         });
 
+        lv2.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if ( lv2.isItemChecked(position)){
+                    lv2.setItemChecked(position, true);
+
+                }
+                else
+                {
+                    lv2.setItemChecked(position, false);
+
+                }
+            }
+        });
+
         btn_float = findViewById(R.id.floatButton);
         btn_float.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: Wenn übergabe. size + andere Liste+size >5!!!
-                if(lv1.getCheckedItemCount()>5){
+                if((lv1.getCheckedItemCount() + lv2.getCheckedItemCount())>5){
                     Toast.makeText(getApplicationContext(),  "Max 5 Bestandteile auswählen!", Toast.LENGTH_SHORT).show();
                 }
                 else
@@ -102,6 +129,16 @@ public class NewProduct extends AppCompatActivity {
                         {
                             int pos = checked.keyAt(i);
                             übergabe[counter] = lv1.getItemAtPosition(pos).toString();
+                            counter++;
+                        }
+                    }
+                    SparseBooleanArray checked2 = lv2.getCheckedItemPositions();
+                    for (int i = 0; i < checked2.size(); i++)
+                    {
+                        if (checked2.valueAt(i))
+                        {
+                            int pos = checked2.keyAt(i);
+                            übergabe[counter] = lv2.getItemAtPosition(pos).toString();
                             counter++;
                         }
                     }

@@ -1,7 +1,9 @@
 package com.example.jojo.recyclescan;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,9 +60,9 @@ public static final String TAG = "MyActivity";
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
-                            //TODO: Process anlegen! Antwort dauert bei "No such document" sehr lange... (drehender Kreis, neue Activity?)
                             if (document.exists()) {
                                 Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+
                                 Intent ergebnisIntent = new Intent(getApplicationContext(), Ergebnis.class);
                                 ergebnisIntent.putExtra("EAN", ean);
                                 String bezeichnung = document.get("Bezeichnung").toString();
@@ -86,6 +88,8 @@ public static final String TAG = "MyActivity";
                             }
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
+                            Toast.makeText(MainActivity.this,"Überpüfe deine Internetverbindung",Toast.LENGTH_SHORT).show();
+
                         }
                     }
                 });
