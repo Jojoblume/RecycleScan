@@ -4,6 +4,10 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ListView;
 
+/**
+ * Eigene ListView, damit Auflistung der Bestandteile in NewProductActivity.class nur so hoch ist, wie nötig.
+ * (Siehe Methode OnMeasure)
+ */
 public class MyListView extends ListView {
 
     public MyListView(Context context, AttributeSet attrs) {

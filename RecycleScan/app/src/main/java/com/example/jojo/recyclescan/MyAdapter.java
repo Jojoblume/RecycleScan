@@ -15,16 +15,24 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MyAdapter extends ArrayAdapter<Bestandteil> {
+/**
+ * Eigener Adapter für die ListView in ErgebnisActivity.class
+ * Die Liste soll ein Bild und die Bezeichnung angeben.
+ * Die Klasse Bestandteil ist dazu notwendig.
+ */
+public class MyAdapter extends ArrayAdapter<Bestandteil>{
 
     private Context mContext;
-    private List<Bestandteil> besList = new ArrayList<>();
+    private List<Bestandteil> besList ;
 
     public MyAdapter(@NonNull Context context, @SuppressLint("SupportAnnotationUsage") @LayoutRes ArrayList<Bestandteil> list) {
         super(context, 0 , list);
         mContext = context;
         besList = list;
+    }
+
+    public String getName(int position){
+        return besList.get(position).getmName();
     }
 
     @NonNull
@@ -44,4 +52,6 @@ public class MyAdapter extends ArrayAdapter<Bestandteil> {
 
         return listItem;
     }
+
 }
+

@@ -1,10 +1,13 @@
 package com.example.jojo.recyclescan;
 
+/**
+ * Klasse Bestandteil für MyAdapter. Ein Bestandteil in der ListView besteht aus einem Namen und einem Bild.
+ */
 public class Bestandteil {
         private int mImageDrawable;
         private String mName;
 
-        // Constructor that is used to create an instance of the Movie object
+
         public Bestandteil(int mImageDrawable, String mName) {
             this.mImageDrawable = mImageDrawable;
             this.mName = mName;
@@ -25,5 +28,6 @@ public class Bestandteil {
         public void setmName(String mName) {
             this.mName = mName;
         }
+
 
 }
