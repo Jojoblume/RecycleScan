@@ -27,16 +27,13 @@
         android:imeOptions="actionDone"
         android:singleLine="true"
         android:lines="1"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:cursorVisible="false"/>
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@+id/startScan"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,7 +43,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView1"
@@ -69,8 +68,8 @@
 
                     <ImageView
                         android:id="@+id/imageStart"
-                        android:layout_width="wrap_content"
-                        android:layout_height="120dp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="150dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/start"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -120,8 +119,8 @@
 
                     <ImageView
                         android:id="@+id/imageIndustrie"
-                        android:layout_width="wrap_content"
-                        android:layout_height="120dp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="150dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/industrie"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -171,8 +170,8 @@
 
                     <ImageView
                         android:id="@+id/imageAlu"
-                        android:layout_width="wrap_content"
-                        android:layout_height="120dp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="150dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/img_alu"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -191,7 +190,7 @@
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="16dp"
                         android:lineSpacingExtra="2sp"
-                        android:text="Irrsinn Alufolie \nKomische Verpackungsgesetze und warum Alufolie zum selbst verpacken streng genommen nicht in die gelbe Tonne dürfen."
+                        android:text="Das neue Verpackungsgesetz und warum Alufolie zum selbst verpacken streng genommen nicht in die gelbe Tonne darf."
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -262,7 +261,7 @@
         android:layout_height="60dp"
         android:layout_weight="1"
         android:background="@color/colorPrimary"
-        android:text="SCANNEN"
+        android:text="BARCODE SCANNEN"
         android:textAllCaps="true"
         android:textColor="@android:color/white"
         android:textSize="18sp"
