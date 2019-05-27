@@ -128,14 +128,11 @@ public class ErgebnisActivity extends AppCompatActivity {
     //Gibt int zurück, da die Images R.drawable.. den Datentyp Integer haben.
     public int getTonne(String bes){
 
-        String farblos = getString(R.string.farblos);
-        String farblosCode = getString(R.string.farblosCode);
-
         if ( gelb.contains(bes) || gelbCode.contains(bes)){
             return R.drawable.trash;
         }
         else if(glas.contains(bes) || glasCode.contains(bes)){
-            if (bes.equals(farblos) || bes.equals(farblosCode)){
+            if (bes.equals(getString(R.string.farblos)) || bes.equals(getString(R.string.farblosCode))){
                 return R.drawable.glass_white; //farblos
             } else if (bes.equals(getString(R.string.gruen)) || bes.equals(getString(R.string.anders)) || bes.equals(getString(R.string.gruenCode))) {
                 return R.drawable.glass_green; //grün

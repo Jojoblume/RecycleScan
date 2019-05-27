@@ -5,7 +5,9 @@ import android.util.AttributeSet;
 import android.widget.ListView;
 
 /**
- * Eigene ListView, damit Auflistung der Bestandteile in NewProductActivity.class nur so hoch ist, wie nötig.
+ * Eigene ListView, damit Auflistung der Bestandteile in NewProductActivity.class so hoch ist, wie nötig.
+ * Ansonsten, wenn nur height: wrap_content, wurde nur das erste Item angezeigt und die anderen Items befanden sich
+ * unsichtbar als ScrollView darunter.
  * (Siehe Methode OnMeasure)
  */
 public class MyListView extends ListView {

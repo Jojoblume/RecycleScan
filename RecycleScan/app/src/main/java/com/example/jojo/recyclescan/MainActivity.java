@@ -26,6 +26,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -72,18 +74,10 @@ public static final String TAG = "MyActivity";
                                     ergebnisIntent.putExtra("EAN", ean);
                                     String bezeichnung = document.get("Bezeichnung").toString();
                                     ergebnisIntent.putExtra("BEZ", bezeichnung);
-                                    String bes1 = document.get("Bestandteil 1").toString();
-                                    String bes2 = document.get("Bestandteil 2").toString();
-                                    String bes3 = document.get("Bestandteil 3").toString();
-                                    String bes4 = document.get("Bestandteil 4").toString();
-                                    String bes5 = document.get("Bestandteil 5").toString();
-                                    ArrayList<String> array = new ArrayList<>();
-                                    array.add(bes1);
-                                    array.add(bes2);
-                                    array.add(bes3);
-                                    array.add(bes4);
-                                    array.add(bes5);
-                                    ergebnisIntent.putExtra("TEILE", array);
+                                    ArrayList<String> array = (ArrayList<String>) document.get("Bestandteile");
+                                    Log.d(TAG, array.toString());
+
+                                    ergebnisIntent.putStringArrayListExtra("TEILE", array);
                                     startActivity(ergebnisIntent);
                                 } else {
                                     Toast.makeText(MainActivity.this,"Barcode unbekannt. Zum Hinzufügen zur Datenbank bitte den Scanner benutzen",Toast.LENGTH_SHORT).show();
@@ -173,17 +167,9 @@ public static final String TAG = "MyActivity";
                                 ergebnisIntent.putExtra("EAN", ean);
                                 String bezeichnung = document.get("Bezeichnung").toString();
                                 ergebnisIntent.putExtra("BEZ", bezeichnung);
-                                String bes1 = document.get("Bestandteil 1").toString();
-                                String bes2 = document.get("Bestandteil 2").toString();
-                                String bes3 = document.get("Bestandteil 3").toString();
-                                String bes4 = document.get("Bestandteil 4").toString();
-                                String bes5 = document.get("Bestandteil 5").toString();
-                                ArrayList<String> array = new ArrayList<>();
-                                array.add(bes1);
-                                array.add(bes2);
-                                array.add(bes3);
-                                array.add(bes4);
-                                array.add(bes5);
+                                ArrayList<String> array = (ArrayList<String>) document.get("Bestandteile");
+                                Log.d(TAG, array.toString());
+
                                 ergebnisIntent.putExtra("TEILE", array);
                                 startActivity(ergebnisIntent);
                             } else {

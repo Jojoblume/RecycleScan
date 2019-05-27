@@ -104,6 +104,8 @@ public class NewProductActivity extends AppCompatActivity {
                     }
                     else{
 
+                        //Maximal 5. Früher kein Array in Firebase deswegen Bestandteil 1-5.
+                        //Nun maximal 5 wegen dem User Interface. (Ansonsten ScrollView nötig)
                         String[] übergabe = {"","","","",""};
                         int counter = 0;
 
@@ -130,11 +132,7 @@ public class NewProductActivity extends AppCompatActivity {
 
                         Map<String, Object> product = new HashMap<>();
                         product.put("Bezeichnung", bez);
-                        product.put("Bestandteil 1", übergabe[0]);
-                        product.put("Bestandteil 2", übergabe[1]);
-                        product.put("Bestandteil 3", übergabe[2]);
-                        product.put("Bestandteil 4", übergabe[3]);
-                        product.put("Bestandteil 5", übergabe[4]);
+                        product.put("Bestandteile", Arrays.asList(übergabe));
 
                         db.collection("Produkte").document(ean)
                                 .set(product)

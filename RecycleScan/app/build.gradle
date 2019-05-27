@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.jojo.recyclescan"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 27
         multiDexEnabled true
         versionCode 1

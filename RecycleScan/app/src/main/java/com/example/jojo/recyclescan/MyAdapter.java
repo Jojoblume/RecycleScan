@@ -26,7 +26,7 @@ public class MyAdapter extends ArrayAdapter<Bestandteil>{
     private List<Bestandteil> besList ;
 
     public MyAdapter(@NonNull Context context, @SuppressLint("SupportAnnotationUsage") @LayoutRes ArrayList<Bestandteil> list) {
-        super(context, 0 , list);
+        super(context, 0, list);
         mContext = context;
         besList = list;
     }
@@ -40,7 +40,7 @@ public class MyAdapter extends ArrayAdapter<Bestandteil>{
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View listItem = convertView;
         if(listItem == null)
-            listItem = LayoutInflater.from(mContext).inflate(R.layout.list_item_bes,parent,false);
+            listItem = LayoutInflater.from(mContext).inflate(R.layout.list_item_bes, parent, false);
 
         Bestandteil bestandteil = besList.get(position);
 
