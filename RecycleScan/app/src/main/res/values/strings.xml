@@ -224,4 +224,27 @@
     </string-array>
 
     <string name="action_settings">Settings</string>
+
+
+    <!-- NEUE ARRAYS FÜR VEREINFACHTE AUSWAHL-->
+
+    <string-array name="arrayKurz1">
+        <item>Verpackungsplastik</item>
+        <item>Tetra Pak</item>
+        <item>Karton / Pappe / Papier</item>
+        <item>Glas</item>
+
+
+    </string-array>
+
+    <string-array name="arrayKurz2">
+        <item>Verbundstoff</item>
+        <item>Konservendose (Weißblech)</item>
+        <item>PET Flasche (Ohne Pfand)</item>
+        <item>Aluminium</item>
+        <item>Verschluss (Clips, Alu, Kunststoff, Blech)</item>
+        <item>Plastik Banderole</item>
+        <item>Holzschachtel (z.B. von Käse)</item>
+    </string-array>
+
 </resources>

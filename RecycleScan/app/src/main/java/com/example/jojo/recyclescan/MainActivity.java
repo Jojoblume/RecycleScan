@@ -26,8 +26,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
 
 
 /**
@@ -174,7 +173,7 @@ public static final String TAG = "MyActivity";
                                 startActivity(ergebnisIntent);
                             } else {
                                 Log.d(TAG, "No such document");
-                                Intent newProductIntent = new Intent(getApplicationContext(), NewProductActivity.class);
+                                Intent newProductIntent = new Intent(getApplicationContext(), ProgressStepsActivity.class);
                                 newProductIntent.putExtra("EAN", ean);
                                 startActivity(newProductIntent);
                             }

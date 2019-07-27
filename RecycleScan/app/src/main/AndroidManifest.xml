@@ -11,7 +11,8 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ArticleActivity"></activity>
+        <activity android:name=".ProgressStepsActivity"></activity>
+        <activity android:name=".ArticleActivity" />
         <activity android:name=".InfoTonneActivity" />
         <activity android:name=".SearchActivity" />
         <activity

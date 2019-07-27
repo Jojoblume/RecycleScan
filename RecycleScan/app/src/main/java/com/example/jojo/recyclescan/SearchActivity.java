@@ -44,11 +44,7 @@ public class SearchActivity extends AppCompatActivity {
 
         lv_search = findViewById(R.id.ListViewSearch);
 
-        //Liste der dualen Systeme einfach in Items gepackt.
-        //Zugriff von jeder Activity aus... Man muss nicht extra von den Klassen Objekte generieren...
-        //In Klasse muss nicht mit ArrayList jedes String Objekt einzeleln mit .add("") hinzugefügt werden.
-        //Array ist einfach da :)
-        //UUUUND: Bei Änderungen der Liste, ist es einfacher.
+
         arrayProdukteGelb = Arrays.asList(getResources().getStringArray(R.array.arrayProdukteGelb));
         arrayProdukteGlas = Arrays.asList(getResources().getStringArray(R.array.arrayProdukteGlas));
         arrayProduktePappe = Arrays.asList(getResources().getStringArray(R.array.arrayProduktePappe));
