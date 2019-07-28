@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import com.shuhart.stepview.StepView;
 
@@ -15,14 +14,25 @@ public class ProgressStepsActivity extends AppCompatActivity {
     StepView stepView;
     ArrayList<String> stepNames = new ArrayList<>();
 
-    Fragment selectedFragment;
-    Fragment fragment2;
-    FloatingActionButton weiter;
+    String ean;
+
+    Fragment fragmentBezeichnung;
+    Fragment fragmentList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_steps);
+
+        fragmentBezeichnung = new FragmentBezeichnung();
+        fragmentList = new FragmentSingleChoiceList();
+
+
+        ean = getIntent().getExtras().getString("EAN");
+        Bundle bundle = new Bundle();
+        bundle.putString("EAN", ean);
+        fragmentBezeichnung.setArguments(bundle);
 
         stepNames.add("Bezeichnung");
         stepNames.add("Bestandteile");
@@ -30,46 +40,36 @@ public class ProgressStepsActivity extends AppCompatActivity {
         stepView = findViewById(R.id.stepView);
         stepView.setSteps(stepNames);
 
-        //TODO: Button in Activity oder lieber in Fragment? Frage, wie in Fragment stepView.go() ausgeführt werden kann...
-        weiter = findViewById(R.id.weiter);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
+
+        //TODO: Button in Activity oder lieber in Fragment? - JA - Frage, wie in Fragment stepView.go() ausgeführt werden kann...
 
 
-        selectedFragment = new FragmentBezeichnung();
-        fragment2 = new FragmentSingleChoiceList();
 
-        getFragment();
-
-        weiter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO: Nicht bei jedem Fragment...
-                stepView.go(stepView.getCurrentStep() + 1, true);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment2).commit();
-
-            }
-        });
     }
 
-
-    public String getEAN() {
-        return getIntent().getExtras().getString("EAN");
+    public void goStep(){
+        stepView.go(stepView.getCurrentStep() + 1, true);
     }
 
     public void getFragment() {
-        int step = stepView.getCurrentStep();
+        int step = stepView.getCurrentStep() +1;
         switch (step) {
-            case 0:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selectedFragment).commit();
-                break;
             case 1:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment2).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
                 break;
 
             default:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selectedFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
                 break;
         }
     }
+
+
+
+
+
+
 
 
 }

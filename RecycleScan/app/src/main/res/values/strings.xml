@@ -1,13 +1,7 @@
 <resources>
     <string name="app_name">Recycle Scan</string>
     <string name="title_activity_portrait">Portrait</string>
-    <string name="Begrüßung">Hallo!
-    Scanne ein Produkt (Vorerst bitte nur Lebensmittelverpackungen) und erhalte Informationen zur Mülltrennung.
-    Da du die erste Testversion hast, wirst du noch nicht viele Informationen erhalten, sondern musst sie hinzufügen.
-    Bitte gebe dazu die Bezeichnung des Produkts ein. Z.B. einfach "Milch"  oder "Landliebe Haltbare Vollmilch 3,5%". Es geht darum, dass der Benutzer weiß, dass er das richtige Produkt gescannt hat.
-    Als nächstes kannst du aus der Liste bis zu 5 Bestandteile auswählen. Dabei kannst du entweder Bestandteile aus der Liste "Verpackungsbestandteile" auswählen UND/ODER
-    aus der Liste "Recyclingcodes". Dabei bitte keine doppelten Angaben machen. Kombinationen sind aber möglich!
-    Viel Spaß! </string>
+
 
     <!--
     GELBE TONNE INFO
@@ -67,6 +61,8 @@
         Haushaltsmüll, der sich nicht recyceln lässt.
     </string>
 
+
+    <!-- STANDARD LISTE-->
 
     <string-array name="arrayProdukteGelb">
         <item>Aludeckel</item>
@@ -161,6 +157,7 @@
 
     </string-array>
 
+    <!--BESTANDTIELE-->
 
     <string-array name="arrayBestandteileGelb">
         <item>Verpackungsplastik</item>
@@ -169,9 +166,8 @@
         <item>Verbundstoff</item>
         <item>Aluminium</item>
         <item>PET Flasche (Ohne Pfand)</item>
-        <item>Getränkekarton</item>
         <item>Holzschachtel (z.B. von Käse)</item>
-        <item>Tetra Pak (mit Deckel)</item>
+        <item>Tetra Pak</item>
         <item>Plastik Banderole</item>
     </string-array>
 
@@ -239,12 +235,13 @@
 
     <string-array name="arrayKurz2">
         <item>Verbundstoff</item>
+        <item>Aluminium</item>
         <item>Konservendose (Weißblech)</item>
         <item>PET Flasche (Ohne Pfand)</item>
-        <item>Aluminium</item>
         <item>Verschluss (Clips, Alu, Kunststoff, Blech)</item>
         <item>Plastik Banderole</item>
         <item>Holzschachtel (z.B. von Käse)</item>
+        <item>Ich weiß nicht</item>
     </string-array>
 
 </resources>

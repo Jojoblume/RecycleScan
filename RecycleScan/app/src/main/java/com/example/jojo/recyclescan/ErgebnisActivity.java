@@ -78,7 +78,7 @@ public class ErgebnisActivity extends AppCompatActivity {
         }
         else {
             for (int i = 0; i<array.size(); i++){
-                if (array.get(i).equals("Tetra Pak (mit Deckel)")){
+                if (array.get(i).equals("Tetra Pak")){
                     hinweis.setText("Hinweis: Tetra Pak");
                     hinweisText.setText("Verschlusskappe wieder anbringen und Trinkhalme zurück in die Packung drücken.  ");
                     cardView.setVisibility(View.VISIBLE);
