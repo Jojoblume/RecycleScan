@@ -58,43 +58,50 @@ public static final String TAG = "MyActivity";
         search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ( (actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN ))){
-                    final String ean =search.getText().toString();
-                    final DocumentReference docRef = db.collection("Produkte").document(ean);
-                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                if ( (actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN ))) {
+                    final String ean = search.getText().toString();
+                    if(ean.isEmpty()){
+                        Toast.makeText(MainActivity.this, "Trage eine Barcode Nummer ein", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        final DocumentReference docRef = db.collection("Produkte").document(ean);
+                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
-                                    Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
-                                    ergebnisIntent.putExtra("EAN", ean);
-                                    String bezeichnung = document.get("Bezeichnung").toString();
-                                    ergebnisIntent.putExtra("BEZ", bezeichnung);
-                                    ArrayList<String> array = (ArrayList<String>) document.get("Bestandteile");
-                                    Log.d(TAG, array.toString());
+                                        Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
+                                        ergebnisIntent.putExtra("EAN", ean);
+                                        String bezeichnung = document.get("Bezeichnung").toString();
+                                        ergebnisIntent.putExtra("BEZ", bezeichnung);
+                                        ArrayList<String> array = (ArrayList<String>) document.get("Bestandteile");
+                                        Log.d(TAG, array.toString());
 
-                                    ergebnisIntent.putStringArrayListExtra("TEILE", array);
-                                    startActivity(ergebnisIntent);
+                                        ergebnisIntent.putStringArrayListExtra("TEILE", array);
+                                        startActivity(ergebnisIntent);
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Barcode unbekannt. Zum Hinzufügen zur Datenbank bitte den Scanner benutzen", Toast.LENGTH_SHORT).show();
+
+                                    }
                                 } else {
-                                    Toast.makeText(MainActivity.this,"Barcode unbekannt. Zum Hinzufügen zur Datenbank bitte den Scanner benutzen",Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG, "get failed with ", task.getException());
+                                    Toast.makeText(MainActivity.this, "Überpüfe deine Internetverbindung", Toast.LENGTH_SHORT).show();
 
                                 }
-                            } else {
-                                Log.d(TAG, "get failed with ", task.getException());
-                                Toast.makeText(MainActivity.this,"Überpüfe deine Internetverbindung",Toast.LENGTH_SHORT).show();
-
                             }
-                        }
-                    });
+                        });
+
+                    }
                     return true;
                 }
                 else{
                     return false;
                 }
             }
+
         });
 
         scanButton = findViewById(R.id.startScan);
@@ -217,4 +224,5 @@ public static final String TAG = "MyActivity";
 
         return super.onOptionsItemSelected(item);
     }
+
 }

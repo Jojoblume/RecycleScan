@@ -3,6 +3,7 @@ package com.example.jojo.recyclescan;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +26,14 @@ public class FragmentSingleChoiceList extends Fragment {
     List<String> arrayKurz2;
     TextView mehrAnzeigen;
 
+    FloatingActionButton weiterBestandteil;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_singlechoicelist, container, false);
+
+
 
         list1 = view.findViewById(R.id.listViewBes1);
         arrayKurz1 = Arrays.asList(getResources().getStringArray(R.array.arrayKurz1));
@@ -44,6 +49,19 @@ public class FragmentSingleChoiceList extends Fragment {
             public void onClick(View v) {
                 mehrAnzeigen.setVisibility(View.GONE);
                 updateData();
+            }
+        });
+
+        weiterBestandteil = view.findViewById(R.id.weiterBestandteilListe);
+        weiterBestandteil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = list1.getCheckedItemPosition();
+                String bestandteil = list1.getItemAtPosition(pos).toString();
+                ((ProgressStepsActivity)getActivity()).addBestandteil(bestandteil);
+
+                ((ProgressStepsActivity)getActivity()).getFragment();
+                ((ProgressStepsActivity)getActivity()).goStep();
             }
         });
 
