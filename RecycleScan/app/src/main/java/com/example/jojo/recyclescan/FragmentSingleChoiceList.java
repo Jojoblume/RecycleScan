@@ -58,10 +58,11 @@ public class FragmentSingleChoiceList extends Fragment {
             public void onClick(View v) {
                 int pos = list1.getCheckedItemPosition();
                 String bestandteil = list1.getItemAtPosition(pos).toString();
+                //TODO: add Bestandteil NICHT bei Glas Pappe und Weiß nicht!!!
                 ((ProgressStepsActivity)getActivity()).addBestandteil(bestandteil);
+                ((ProgressStepsActivity)getActivity()).setCurrentBestandteil(bestandteil);
 
                 ((ProgressStepsActivity)getActivity()).getFragment();
-                ((ProgressStepsActivity)getActivity()).goStep();
             }
         });
 

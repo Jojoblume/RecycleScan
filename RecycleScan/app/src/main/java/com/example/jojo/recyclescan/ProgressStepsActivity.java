@@ -18,6 +18,7 @@ import com.shuhart.stepview.StepView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProgressStepsActivity extends AppCompatActivity {
@@ -27,10 +28,18 @@ public class ProgressStepsActivity extends AppCompatActivity {
     String ean;
     String bez;
     ArrayList<String> bestandteile = new ArrayList<>();
+    String currentBestandteil;
+
+    List<String> gelb = new ArrayList<>();
+
+    boolean verschlussGefragt = false;
 
     Fragment fragmentBezeichnung;
     Fragment fragmentList;
     Fragment fragmentBestätigen;
+
+    //"Unter" Fragmente
+    Fragment fragmentFrageVerschluss;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -44,6 +53,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
         fragmentList = new FragmentSingleChoiceList();
         fragmentBestätigen = new FragmentBestatigen();
 
+        fragmentFrageVerschluss = new FragmentFrageVerschluss();
+
+        gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
+
 
         ean = getIntent().getExtras().getString("EAN");
         Bundle bundle = new Bundle();
@@ -56,32 +69,75 @@ public class ProgressStepsActivity extends AppCompatActivity {
         stepView = findViewById(R.id.stepView);
         stepView.setSteps(stepNames);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
-
-        //TODO: Button in Activity oder lieber in Fragment? - JA - Frage, wie in Fragment stepView.go() ausgeführt werden kann...
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung, "FRAGMENTBEZ").commit();
 
 
+    }
+
+
+
+    /**
+     * Hier Entscheidung, welches Fragment als nächstes angezeigt werden muss.
+     * Dabei nicht nur StepView Schritte entscheidend.
+     * Abhängig von Benutzerentscheidung.
+     */
+    public void getFragment() {
+
+        //https://stackoverflow.com/questions/9294603/how-do-i-get-the-currently-displayed-fragment
+        //Fragment myFragment = getSupportFragmentManager().findFragmentByTag("FRAGMENTBEZ");
+
+        if (fragmentBezeichnung != null && fragmentBezeichnung.isVisible()) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
+            goStep();
+        }
+        if(fragmentList != null && fragmentList.isVisible())
+        {
+            if(gelb.contains(currentBestandteil)){
+                if (verschlussGefragt == false){
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageVerschluss).commit();
+                    verschlussGefragt = true;
+                }
+                else{
+                    //starte Frage Fragment
+                    //mit folgender Frage: "Noch mehr?"
+                    //Bei Nein: Übericht + ((ProgressStepsActivity)getActivity()).goStep();
+                    //Bei Ja: fragmentList und der Loop startet von neu...
+                }
+
+            }
+            //else if Pappe {}
+            //else if Glas{}
+            //else if "Weiß nicht"{}
+            //unten else dann weg?
+            else
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
+                goStep();
+            }
+         }
+        if  (fragmentFrageVerschluss != null && fragmentFrageVerschluss.isVisible()){
+            //Später gibts noch mehr?
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
+            goStep();
+        }
+
+        /**int step = stepView.getCurrentStep() +1;
+        switch (step) {
+            case 1:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList, "FRAGMENTLIST").commit();
+                break;
+            case 2:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen, "FRAGMENTBEST").commit();
+                break;
+
+            default:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung, "FRAGMENTBEZ").commit();
+                break;
+        }**/
     }
 
     public void goStep(){
         stepView.go(stepView.getCurrentStep() + 1, true);
-    }
-
-    public void getFragment() {
-        //Hier der ganze Code für die Verzweigungen???
-        int step = stepView.getCurrentStep() +1;
-        switch (step) {
-            case 1:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
-                break;
-            case 2:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
-                break;
-
-            default:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
-                break;
-        }
     }
 
     public void getBezeichnung(String data){
@@ -95,6 +151,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     public ArrayList<String> getBestandteile(){
         return bestandteile;
+    }
+
+    public void setCurrentBestandteil(String bestandteil) {
+        currentBestandteil = bestandteil;
     }
 
 
@@ -165,5 +225,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
         alert.show();
 
     }
+
+
 }
 

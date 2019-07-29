@@ -1,6 +1,7 @@
 package com.example.jojo.recyclescan;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,6 +35,9 @@ public class FragmentBezeichnung extends Fragment {
         ean.setText(getArguments().getString("EAN"));
 
         editBezeichnung = view.findViewById(R.id.editTextBez);
+        //https://stackoverflow.com/questions/10508363/show-keyboard-for-edittext-when-fragment-starts
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
         weiter = view.findViewById(R.id.weiter);
@@ -41,8 +46,6 @@ public class FragmentBezeichnung extends Fragment {
             public void onClick(View v) {
 
                 String bez = editBezeichnung.getText().toString();
-
-
                 if(bez.equals("") || bez.equals(" "))
                 {
                     //https://stackoverflow.com/questions/6290531/check-if-edittext-is-empty {
@@ -74,7 +77,7 @@ public class FragmentBezeichnung extends Fragment {
                      .replace(R.id.fragmentContainer, fragmentList, "findFragmentList")
                      .commit();**/
                     ((ProgressStepsActivity)getActivity()).getFragment();
-                    ((ProgressStepsActivity)getActivity()).goStep();
+
                 }
 
             }

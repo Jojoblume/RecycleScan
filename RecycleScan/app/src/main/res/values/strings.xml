@@ -159,6 +159,8 @@
 
     <!--BESTANDTIELE-->
 
+    <string name = "Verschluss">Verschluss (Clips, Alu, Kunststoff, Blech)</string>
+
     <string-array name="arrayBestandteileGelb">
         <item>Verpackungsplastik</item>
         <item>Verschluss (Clips, Alu, Kunststoff, Blech)</item>
