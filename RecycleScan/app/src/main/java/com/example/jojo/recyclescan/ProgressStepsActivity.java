@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -22,26 +21,32 @@ import java.util.List;
 import java.util.Map;
 
 public class ProgressStepsActivity extends AppCompatActivity {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     StepView stepView;
     ArrayList<String> stepNames = new ArrayList<>();
 
     String ean;
     String bez;
     ArrayList<String> bestandteile = new ArrayList<>();
-    String currentBestandteil;
+    String currentState;
 
     List<String> gelb = new ArrayList<>();
+    List<String> pap = new ArrayList<>();
+    List<String> glas = new ArrayList<>();
 
     boolean verschlussGefragt = false;
 
     Fragment fragmentBezeichnung;
     Fragment fragmentList;
     Fragment fragmentBestätigen;
-
     //"Unter" Fragmente
     Fragment fragmentFrageVerschluss;
+    Fragment fragmentFrageSichtfenster;
+    Fragment fragmentFrageCode;
+    Fragment fragmentFrageMehr;
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +59,12 @@ public class ProgressStepsActivity extends AppCompatActivity {
         fragmentBestätigen = new FragmentBestatigen();
 
         fragmentFrageVerschluss = new FragmentFrageVerschluss();
+        fragmentFrageSichtfenster = new FragmentFrageSichtfenster();
+        fragmentFrageCode = new FragmentFrageCode();
+        fragmentFrageMehr = new FragmentFrageMehr();
 
         gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
-
+        pap = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteilePap));
 
         ean = getIntent().getExtras().getString("EAN");
         Bundle bundle = new Bundle();
@@ -69,12 +77,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
         stepView = findViewById(R.id.stepView);
         stepView.setSteps(stepNames);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung, "FRAGMENTBEZ").commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
 
 
     }
-
-
 
     /**
      * Hier Entscheidung, welches Fragment als nächstes angezeigt werden muss.
@@ -90,35 +96,72 @@ public class ProgressStepsActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
             goStep();
         }
-        if(fragmentList != null && fragmentList.isVisible())
+        //1.EBENE
+        else if(fragmentList != null && fragmentList.isVisible())
         {
-            if(gelb.contains(currentBestandteil)){
+            //GELB?
+            if(gelb.contains(currentState)){
                 if (verschlussGefragt == false){
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageVerschluss).commit();
                     verschlussGefragt = true;
                 }
                 else{
-                    //starte Frage Fragment
-                    //mit folgender Frage: "Noch mehr?"
-                    //Bei Nein: Übericht + ((ProgressStepsActivity)getActivity()).goStep();
-                    //Bei Ja: fragmentList und der Loop startet von neu...
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
                 }
 
             }
-            //else if Pappe {}
-            //else if Glas{}
-            //else if "Weiß nicht"{}
-            //unten else dann weg?
+            //PAPPE?
+            else if (pap.contains(currentState))
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageSichtfenster).commit();
+            }
+            //GLAS?
+            else if (currentState.equals("Glas")){
+                //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeGlas).commit();
+                //Nachdem Farbe klar ist: Nach Verschluss fragen!
+            }
+            //WEISS NICHT?
+            else if (currentState.equals("Ich weiß nicht"))
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageCode).commit();
+            }
+
+         }
+        //2.EBENE
+        else if (fragmentFrageCode != null && fragmentFrageCode.isVisible())
+        {
+            if(currentState.equals("CodeJa")){
+                //---->getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeCode).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
+            }
             else
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
-                goStep();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
             }
-         }
-        if  (fragmentFrageVerschluss != null && fragmentFrageVerschluss.isVisible()){
-            //Später gibts noch mehr?
+        }
+        //Nur else???
+        /**else if  (fragmentFrageVerschluss != null && fragmentFrageVerschluss.isVisible()){
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
+        }
+        else if (fragmentFrageSichtfenster != null && fragmentFrageSichtfenster.isVisible()){
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
+
+        }**/
+        //MEHR?
+        //Wenn Bei Frage Mehr? "NEIN" ausgewählt wird:
+        else if (currentState.equals("ENDE"))
+        {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
             goStep();
+        }
+        else if(currentState.equals("MehrJa")){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
+        }
+        else
+        {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
         }
 
         /**int step = stepView.getCurrentStep() +1;
@@ -149,12 +192,18 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
+    public Integer getBestandteileCount(){
+       return bestandteile.size();
+    }
+
     public ArrayList<String> getBestandteile(){
         return bestandteile;
     }
 
-    public void setCurrentBestandteil(String bestandteil) {
-        currentBestandteil = bestandteil;
+    public void setCurrentState(String bestandteil) {
+        currentState = bestandteil;
+
+
     }
 
 

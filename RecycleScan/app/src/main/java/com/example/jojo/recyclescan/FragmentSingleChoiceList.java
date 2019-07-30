@@ -12,6 +12,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ public class FragmentSingleChoiceList extends Fragment {
     List<String> arrayKurz1;
     List<String> arrayKurz2;
     TextView mehrAnzeigen;
+    TextView überschrift;
 
     FloatingActionButton weiterBestandteil;
 
@@ -43,6 +45,11 @@ public class FragmentSingleChoiceList extends Fragment {
         list1.setAdapter(adapter);
         list1.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
+        //Ermittlung, der wievielste Bestandteil ausgewählt wird.
+        überschrift = view.findViewById(R.id.textViewÜberschrif);
+        int count = ((ProgressStepsActivity)getActivity()).getBestandteileCount() +1;
+        überschrift.setText(count+". Bestandteil auswählen");
+
         mehrAnzeigen = view.findViewById(R.id.textViewMehrAnzeigen);
         mehrAnzeigen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,12 +64,27 @@ public class FragmentSingleChoiceList extends Fragment {
             @Override
             public void onClick(View v) {
                 int pos = list1.getCheckedItemPosition();
-                String bestandteil = list1.getItemAtPosition(pos).toString();
-                //TODO: add Bestandteil NICHT bei Glas Pappe und Weiß nicht!!!
-                ((ProgressStepsActivity)getActivity()).addBestandteil(bestandteil);
-                ((ProgressStepsActivity)getActivity()).setCurrentBestandteil(bestandteil);
+                //Fehler abfangen, wenn kein Item/Bestandteil ausgewählt ist.
+                String bestandteil ="";
+                if (list1.isItemChecked(pos)){
+                     bestandteil = list1.getItemAtPosition(pos).toString();
+                }
 
-                ((ProgressStepsActivity)getActivity()).getFragment();
+                if (!bestandteil.isEmpty()){
+                    if (Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb)).contains(bestandteil))
+                    {
+                        ((ProgressStepsActivity)getActivity()).addBestandteil(bestandteil);
+                    }
+                    //Bei Glas, Pappe und "Weiß nicht" soll Bestandteil nicht dem Array hinzugefügt werden.
+                    //currentState ist zur Ermittlung, was ausgewählt wurde.
+                    ((ProgressStepsActivity)getActivity()).setCurrentState(bestandteil);
+
+                    ((ProgressStepsActivity)getActivity()).getFragment();
+                }
+                else{
+                    Toast.makeText(getActivity(), "Du weißt es nicht?", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

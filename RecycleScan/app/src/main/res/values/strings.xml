@@ -161,6 +161,7 @@
 
     <string name = "Verschluss">Verschluss (Clips, Alu, Kunststoff, Blech)</string>
 
+
     <string-array name="arrayBestandteileGelb">
         <item>Verpackungsplastik</item>
         <item>Verschluss (Clips, Alu, Kunststoff, Blech)</item>
@@ -209,6 +210,9 @@
         <item>72 GL</item>
     </string-array>
 
+
+    <string name = "Sichtfenster">Karton mit Plastik-Sichtfenster</string>
+    <string name = "Karton">Karton / Pappe / Papier</string>
 
     <string-array name="arrayBestandteilePap">
         <item>Karton / Pappe / Papier</item>

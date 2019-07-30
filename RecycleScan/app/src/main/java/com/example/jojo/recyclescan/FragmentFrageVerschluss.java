@@ -12,8 +12,6 @@ import android.widget.Button;
 public class FragmentFrageVerschluss extends Fragment {
     View view;
 
-    Fragment fragmentÜbersicht;
-
     Button ja;
     Button nein;
 
@@ -22,8 +20,6 @@ public class FragmentFrageVerschluss extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_frage_verschluss, container, false);
 
-        fragmentÜbersicht = new FragmentBestatigen();
-
         ja = view.findViewById(R.id.buttonJa);
         nein = view.findViewById(R.id.buttonNein);
 
@@ -31,7 +27,7 @@ public class FragmentFrageVerschluss extends Fragment {
             @Override
             public void onClick(View v) {
                 ((ProgressStepsActivity)getActivity()).addBestandteil(getString(R.string.Verschluss));
-                ((ProgressStepsActivity)getActivity()).setCurrentBestandteil(getString(R.string.Verschluss));
+                ((ProgressStepsActivity)getActivity()).setCurrentState(getString(R.string.Verschluss));
                 ((ProgressStepsActivity)getActivity()).getFragment();
                 /**getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainer, fragmentÜbersicht)
