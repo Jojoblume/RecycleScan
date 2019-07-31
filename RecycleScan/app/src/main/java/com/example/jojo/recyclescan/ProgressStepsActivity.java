@@ -46,6 +46,9 @@ public class ProgressStepsActivity extends AppCompatActivity {
     Fragment fragmentFrageCode;
     Fragment fragmentFrageMehr;
 
+    Fragment fragmentListeCode;
+    Fragment fragmentListeGlas;
+
 
 
     @Override
@@ -62,6 +65,9 @@ public class ProgressStepsActivity extends AppCompatActivity {
         fragmentFrageSichtfenster = new FragmentFrageSichtfenster();
         fragmentFrageCode = new FragmentFrageCode();
         fragmentFrageMehr = new FragmentFrageMehr();
+
+        fragmentListeCode = new FragmentListeCode();
+        fragmentListeGlas = new FragmentListeGlas();
 
         gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
         pap = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteilePap));
@@ -117,7 +123,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
             }
             //GLAS?
             else if (currentState.equals("Glas")){
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeGlas).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeGlas).commit();
                 //Nachdem Farbe klar ist: Nach Verschluss fragen!
             }
             //WEISS NICHT?
@@ -127,28 +133,29 @@ public class ProgressStepsActivity extends AppCompatActivity {
             }
 
          }
+        else if ( fragmentListeGlas != null && fragmentListeGlas.isVisible()){
+            if (verschlussGefragt == false){
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageVerschluss).commit();
+                verschlussGefragt = true;
+            }
+            else{
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
+            }
+
+        }
         //2.EBENE
         else if (fragmentFrageCode != null && fragmentFrageCode.isVisible())
         {
             if(currentState.equals("CodeJa")){
-                //---->getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeCode).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeCode).commit();
             }
             else
             {
+                //Leeres Feld mit Fragezeichen oder so darstellen?
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
             }
         }
-        //Nur else???
-        /**else if  (fragmentFrageVerschluss != null && fragmentFrageVerschluss.isVisible()){
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
-        }
-        else if (fragmentFrageSichtfenster != null && fragmentFrageSichtfenster.isVisible()){
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
-
-        }**/
         //MEHR?
         //Wenn Bei Frage Mehr? "NEIN" ausgewählt wird:
         else if (currentState.equals("ENDE"))
@@ -159,24 +166,12 @@ public class ProgressStepsActivity extends AppCompatActivity {
         else if(currentState.equals("MehrJa")){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
         }
+        //Im Zweifel immer fragen, ob es noch mehr Bestandteile gibt
         else
         {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
         }
 
-        /**int step = stepView.getCurrentStep() +1;
-        switch (step) {
-            case 1:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList, "FRAGMENTLIST").commit();
-                break;
-            case 2:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen, "FRAGMENTBEST").commit();
-                break;
-
-            default:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung, "FRAGMENTBEZ").commit();
-                break;
-        }**/
     }
 
     public void goStep(){

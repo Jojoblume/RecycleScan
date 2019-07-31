@@ -35,8 +35,6 @@ public class FragmentSingleChoiceList extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_singlechoicelist, container, false);
 
-
-
         list1 = view.findViewById(R.id.listViewBes1);
         arrayKurz1 = Arrays.asList(getResources().getStringArray(R.array.arrayKurz1));
         arrayKurz2 = Arrays.asList(getResources().getStringArray(R.array.arrayKurz2));
@@ -65,12 +63,8 @@ public class FragmentSingleChoiceList extends Fragment {
             public void onClick(View v) {
                 int pos = list1.getCheckedItemPosition();
                 //Fehler abfangen, wenn kein Item/Bestandteil ausgewählt ist.
-                String bestandteil ="";
                 if (list1.isItemChecked(pos)){
-                     bestandteil = list1.getItemAtPosition(pos).toString();
-                }
-
-                if (!bestandteil.isEmpty()){
+                    String bestandteil = list1.getItemAtPosition(pos).toString();
                     if (Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb)).contains(bestandteil))
                     {
                         ((ProgressStepsActivity)getActivity()).addBestandteil(bestandteil);

@@ -182,6 +182,7 @@
         <item>05 PP</item>
         <item>06 PS</item>
         <item>07 O</item>
+        <item>40 FE</item>
         <item>41 ALU</item>
         <item>80-98 C/* (Verbundstoffe)</item>
     </string-array>
