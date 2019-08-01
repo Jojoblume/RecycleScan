@@ -35,7 +35,15 @@ public class FragmentBestatigen extends Fragment {
         btnBestatigen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ProgressStepsActivity)getActivity()).saveOnFirebase();
+
+
+                if (((ProgressStepsActivity)getActivity()).isNewUser() == false){
+                    String userID = ((ProgressStepsActivity)getActivity()).getUserID();
+                    ((ProgressStepsActivity)getActivity()).saveOnFirebase(userID);
+                } else {
+                    ((ProgressStepsActivity)getActivity()).dialogNewUser();
+                }
+
 
             }
         });

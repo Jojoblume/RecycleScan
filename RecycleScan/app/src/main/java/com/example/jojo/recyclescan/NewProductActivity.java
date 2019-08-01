@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * VERALTET!
  * Activity NewProductActivity.
  * Falls gescanntes Produkt noch nicht in der Datenbank.
  * Abfrage nach Bezeichnung und Bestandteilen.

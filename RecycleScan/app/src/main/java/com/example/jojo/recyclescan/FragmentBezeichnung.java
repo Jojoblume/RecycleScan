@@ -36,8 +36,9 @@ public class FragmentBezeichnung extends Fragment {
 
         editBezeichnung = view.findViewById(R.id.editTextBez);
         //https://stackoverflow.com/questions/10508363/show-keyboard-for-edittext-when-fragment-starts
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        //Später weggelassen. Dialogfenster hinzugekommen. Animation der Tastatur sah zusammen mit Dialog komisch aus.
+        //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
         weiter = view.findViewById(R.id.weiter);

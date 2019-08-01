@@ -1,5 +1,8 @@
 package com.example.jojo.recyclescan;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +22,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,7 +31,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -44,7 +50,11 @@ CardView cv2;
 CardView cv3;
 CardView cv4;
 
+
 FirebaseFirestore db = FirebaseFirestore.getInstance();
+private FirebaseAuth mAuth;
+
+String userID;
 
 public static final String TAG = "MyActivity";
 
@@ -52,6 +62,8 @@ public static final String TAG = "MyActivity";
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
 
         search = findViewById(R.id.searchEAN);
 
@@ -183,10 +195,11 @@ public static final String TAG = "MyActivity";
                                 Intent newProductIntent = new Intent(getApplicationContext(), ProgressStepsActivity.class);
                                 newProductIntent.putExtra("EAN", ean);
                                 startActivity(newProductIntent);
+
                             }
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
-                            Toast.makeText(MainActivity.this,"Überpüfe deine Internetverbindung",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this,"Überpüfe deine Internetverbindung",Toast.LENGTH_LONG).show();
 
                         }
                     }
@@ -224,5 +237,6 @@ public static final String TAG = "MyActivity";
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

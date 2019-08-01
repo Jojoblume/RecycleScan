@@ -8,9 +8,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.shuhart.stepview.StepView;
 
@@ -22,6 +32,7 @@ import java.util.Map;
 
 public class ProgressStepsActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth;
 
     StepView stepView;
     ArrayList<String> stepNames = new ArrayList<>();
@@ -33,13 +44,13 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     List<String> gelb = new ArrayList<>();
     List<String> pap = new ArrayList<>();
-    List<String> glas = new ArrayList<>();
 
     boolean verschlussGefragt = false;
 
     Fragment fragmentBezeichnung;
     Fragment fragmentList;
     Fragment fragmentBestätigen;
+    EditText editTextBenutzername;
     //"Unter" Fragmente
     Fragment fragmentFrageVerschluss;
     Fragment fragmentFrageSichtfenster;
@@ -56,6 +67,13 @@ public class ProgressStepsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_steps);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        dialogStart();
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        //Just for Test!
+        //mAuth.signOut();
 
         fragmentBezeichnung = new FragmentBezeichnung();
         fragmentList = new FragmentSingleChoiceList();
@@ -202,9 +220,11 @@ public class ProgressStepsActivity extends AppCompatActivity {
     }
 
 
-    public void saveOnFirebase() {
+
+    public void saveOnFirebase(String uid) {
         Map<String, Object> product = new HashMap<>();
         product.put("Bezeichnung", bez);
+        product.put("UserID", uid);
         product.put("Bestandteile", bestandteile);
 
         db.collection("Produkte").document(ean)
@@ -227,11 +247,12 @@ public class ProgressStepsActivity extends AppCompatActivity {
                 });
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                dialog();
+                dialogBeenden();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -239,10 +260,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        dialog();
+        dialogBeenden();
     }
 
-    public void dialog(){
+    public void dialogBeenden(){
 
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
         builder1.setTitle("Beenden?");
@@ -269,6 +290,112 @@ public class ProgressStepsActivity extends AppCompatActivity {
         alert.show();
 
     }
+
+    public void dialogStart(){
+
+        //CustomDialog
+        //https://www.codingdemos.com/android-custom-dialog-animation/
+        android.app.AlertDialog.Builder dialogbuilder = new android.app.AlertDialog.Builder(ProgressStepsActivity.this);
+        View dialogView = getLayoutInflater().inflate(R.layout.customdialog_barcodeunknown, null);
+        dialogbuilder.setView(dialogView);
+        dialogbuilder.setCancelable(false);
+
+        dialogbuilder.setPositiveButton(
+                "OK, MACH ICH!",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        dialogbuilder.setNegativeButton(
+                "ABBRECHEN",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        android.app.AlertDialog alertDialog = dialogbuilder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
+        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorGrey));
+
+    }
+
+    public void dialogNewUser(){
+
+        //CustomDialog
+        //https://www.codingdemos.com/android-custom-dialog-animation/
+        android.app.AlertDialog.Builder dialogbuilder = new android.app.AlertDialog.Builder(ProgressStepsActivity.this);
+        View dialogView = getLayoutInflater().inflate(R.layout.customdialog_newuser, null);
+        dialogbuilder.setView(dialogView);
+        dialogbuilder.setCancelable(true);
+        dialogbuilder.setTitle("Danke für deinen 1. Eintrag!\nBenutzername erforderlich.");
+        dialogbuilder.setMessage("\nSomit erstellst du einen anonymen Account und hast viele weitere Möglichkeiten in der App!");
+
+        editTextBenutzername = dialogView.findViewById(R.id.editTextBenutzername);
+
+        dialogbuilder.setPositiveButton(
+                "VERÖFFENTLICHEN",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        String benutzername = editTextBenutzername.getText().toString();
+                        if (!benutzername.isEmpty()){
+                            logIn(benutzername); //+saveUserOnFirebase
+                        }
+                        else{
+                            Toast.makeText(ProgressStepsActivity.this,"Denk dir einen Namen aus",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                });
+
+        android.app.AlertDialog alertDialog = dialogbuilder.create();
+        alertDialog.show();
+
+    }
+
+
+    public boolean isNewUser(){
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if ( currentUser == null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public String getUserID() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String uid = currentUser.getUid();
+        return uid;
+    }
+    public void logIn(final String name){
+        if(isNewUser() == true){
+            mAuth.signInAnonymously().addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                @Override
+                public void onSuccess(AuthResult authResult) {
+                    String userID = mAuth.getCurrentUser().getUid();
+                    saveUserOnFirebase(name, userID);
+                }
+            });
+        }
+    }
+
+    public void saveUserOnFirebase(final String benutzername, final String userID){
+        Map<String, Object> user = new HashMap<>();
+        user.put("UserID", userID);
+        user.put("Benutzername", benutzername);
+        db.collection("User").document(userID)
+                .set(user).addOnSuccessListener(this, new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                saveOnFirebase(userID);
+            }
+        });
+    }
+
 
 
 }
