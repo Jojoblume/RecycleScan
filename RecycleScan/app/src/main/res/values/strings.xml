@@ -159,7 +159,7 @@
 
     <!--BESTANDTIELE-->
 
-    <string name = "Verschluss">Verschluss (Clips, Alu, Kunststoff, Blech)</string>
+    <string name="Verschluss">Verschluss (Clips, Alu, Kunststoff, Blech)</string>
 
 
     <string-array name="arrayBestandteileGelb">
@@ -212,8 +212,8 @@
     </string-array>
 
 
-    <string name = "Sichtfenster">Karton mit Plastik-Sichtfenster</string>
-    <string name = "Karton">Karton / Pappe / Papier</string>
+    <string name="Sichtfenster">Karton mit Plastik-Sichtfenster</string>
+    <string name="Karton">Karton / Pappe / Papier</string>
 
     <string-array name="arrayBestandteilePap">
         <item>Karton / Pappe / Papier</item>

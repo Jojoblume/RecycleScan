@@ -35,11 +35,15 @@ public class FragmentBezeichnung extends Fragment {
         ean.setText(getArguments().getString("EAN"));
 
         editBezeichnung = view.findViewById(R.id.editTextBez);
-        //https://stackoverflow.com/questions/10508363/show-keyboard-for-edittext-when-fragment-starts
-        //Später weggelassen. Dialogfenster hinzugekommen. Animation der Tastatur sah zusammen mit Dialog komisch aus.
-        //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
+        String bezeichnung = ((ProgressStepsActivity)getActivity()).getBezeichnung();
+        if(bezeichnung != ""){
+            editBezeichnung.setText(bezeichnung);
+            editBezeichnung.setSelection(editBezeichnung.getText().length());
+            //Tastatur wird nur angezeigt, wenn vorher nicht das Dialogfenster erscheint. Animation war dann ruckelig.
+            //https://stackoverflow.com/questions/10508363/show-keyboard-for-edittext-when-fragment-starts
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
 
         weiter = view.findViewById(R.id.weiter);
         weiter.setOnClickListener(new View.OnClickListener() {
@@ -73,10 +77,6 @@ public class FragmentBezeichnung extends Fragment {
                 else{
 
                     ((ProgressStepsActivity)getActivity()).getBezeichnung(bez);
-                    /**NEED, wenn nicht stepper Fragment, sondern "unterFragment"
-                     * getActivity().getSupportFragmentManager().beginTransaction()
-                     .replace(R.id.fragmentContainer, fragmentList, "findFragmentList")
-                     .commit();**/
                     ((ProgressStepsActivity)getActivity()).getFragment();
 
                 }

@@ -1,8 +1,5 @@
 package com.example.jojo.recyclescan;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +13,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +27,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -53,8 +47,8 @@ CardView cv4;
 
 FirebaseFirestore db = FirebaseFirestore.getInstance();
 private FirebaseAuth mAuth;
+FirebaseUser currentUser;
 
-String userID;
 
 public static final String TAG = "MyActivity";
 
@@ -64,6 +58,7 @@ public static final String TAG = "MyActivity";
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+
 
         search = findViewById(R.id.searchEAN);
 
@@ -163,6 +158,8 @@ public static final String TAG = "MyActivity";
 
     }
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -194,6 +191,7 @@ public static final String TAG = "MyActivity";
                                 Log.d(TAG, "No such document");
                                 Intent newProductIntent = new Intent(getApplicationContext(), ProgressStepsActivity.class);
                                 newProductIntent.putExtra("EAN", ean);
+                                newProductIntent.putExtra("INTENT", "MainActivity");
                                 startActivity(newProductIntent);
 
                             }
@@ -223,20 +221,49 @@ public static final String TAG = "MyActivity";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+
+        if ( currentUser == null){
+            getMenuInflater().inflate(R.menu.main, menu);
+        }else{
+            getMenuInflater().inflate(R.menu.main_profil, menu);
+        }
+
         return super.onCreateOptionsMenu(menu);
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch(item.getItemId()){
             case R.id.searchIcon:
                 startActivity(new Intent(this, SearchActivity.class));
+                break;
+            case R.id.profile:
+                currentUser = mAuth.getCurrentUser();
+                //Eigentlich nicht sichtbar, aber hier doppelt gesichert:
+                if ( currentUser == null){
+                    Toast.makeText(this, "Trage das 1. Produkt ein", Toast.LENGTH_LONG).show();
+                }else
+                {
+                    startActivity(new Intent(this, ProfilActivity.class));
+                }
+
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Just for Test!
+        //mAuth.signOut();
+
+        currentUser = mAuth.getCurrentUser();
+        invalidateOptionsMenu();
+
+    }
 
 }

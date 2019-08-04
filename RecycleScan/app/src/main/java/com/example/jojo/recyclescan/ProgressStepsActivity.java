@@ -1,7 +1,9 @@
 package com.example.jojo.recyclescan;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,12 +38,18 @@ public class ProgressStepsActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     StepView stepView;
+    ProgressBar progress;
     ArrayList<String> stepNames = new ArrayList<>();
 
     String ean;
     String bez;
     ArrayList<String> bestandteile = new ArrayList<>();
+    ArrayList<String> eingetrageneProdukte = new ArrayList<>();
     String currentState;
+
+    String bezeichnung = "";
+    String creatorID = "";
+
 
     List<String> gelb = new ArrayList<>();
     List<String> pap = new ArrayList<>();
@@ -61,19 +70,25 @@ public class ProgressStepsActivity extends AppCompatActivity {
     Fragment fragmentListeGlas;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_steps);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dialogStart();
+        String previousActivity = getIntent().getExtras().getString("INTENT");
+        if (previousActivity.equals("MainActivity")){
+            dialogStart();
+        }else if (previousActivity.equals("ErgebnisActivity")){
+            bezeichnung = getIntent().getExtras().getString("BEZ");
+            creatorID = getIntent().getExtras().getString("CREATOR");
+        }
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        //Just for Test!
-        //mAuth.signOut();
+        progress = findViewById(R.id.progressBar);
+        progress.setVisibility(View.INVISIBLE);
 
         fragmentBezeichnung = new FragmentBezeichnung();
         fragmentList = new FragmentSingleChoiceList();
@@ -104,7 +119,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
 
 
+
+
     }
+
 
     /**
      * Hier Entscheidung, welches Fragment als nächstes angezeigt werden muss.
@@ -121,54 +139,45 @@ public class ProgressStepsActivity extends AppCompatActivity {
             goStep();
         }
         //1.EBENE
-        else if(fragmentList != null && fragmentList.isVisible())
-        {
+        else if (fragmentList != null && fragmentList.isVisible()) {
             //GELB?
-            if(gelb.contains(currentState)){
-                if (verschlussGefragt == false){
+            if (gelb.contains(currentState)) {
+                if (verschlussGefragt == false) {
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageVerschluss).commit();
                     verschlussGefragt = true;
-                }
-                else{
+                } else {
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
                 }
 
             }
             //PAPPE?
-            else if (pap.contains(currentState))
-            {
+            else if (pap.contains(currentState)) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageSichtfenster).commit();
             }
             //GLAS?
-            else if (currentState.equals("Glas")){
+            else if (currentState.equals("Glas")) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeGlas).commit();
                 //Nachdem Farbe klar ist: Nach Verschluss fragen!
             }
             //WEISS NICHT?
-            else if (currentState.equals("Ich weiß nicht"))
-            {
+            else if (currentState.equals("Ich weiß nicht")) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageCode).commit();
             }
 
-         }
-        else if ( fragmentListeGlas != null && fragmentListeGlas.isVisible()){
-            if (verschlussGefragt == false){
+        } else if (fragmentListeGlas != null && fragmentListeGlas.isVisible()) {
+            if (verschlussGefragt == false) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageVerschluss).commit();
                 verschlussGefragt = true;
-            }
-            else{
+            } else {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
             }
 
         }
         //2.EBENE
-        else if (fragmentFrageCode != null && fragmentFrageCode.isVisible())
-        {
-            if(currentState.equals("CodeJa")){
+        else if (fragmentFrageCode != null && fragmentFrageCode.isVisible()) {
+            if (currentState.equals("CodeJa")) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeCode).commit();
-            }
-            else
-            {
+            } else {
                 //Leeres Feld mit Fragezeichen oder so darstellen?
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
             }
@@ -176,40 +185,37 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
         //MEHR?
         //Wenn Bei Frage Mehr? "NEIN" ausgewählt wird:
-        else if (currentState.equals("ENDE"))
-        {
+        else if (currentState.equals("ENDE")) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
             goStep();
-        }
-        else if(currentState.equals("MehrJa")){
+        } else if (currentState.equals("MehrJa")) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
         }
         //Im Zweifel immer fragen, ob es noch mehr Bestandteile gibt
-        else
-        {
+        else {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
         }
 
     }
 
-    public void goStep(){
+    public void goStep() {
         stepView.go(stepView.getCurrentStep() + 1, true);
     }
 
-    public void getBezeichnung(String data){
+    public void getBezeichnung(String data) {
         bez = data;
     }
 
-    public void addBestandteil(String bestandteil){
+    public void addBestandteil(String bestandteil) {
         bestandteile.add(bestandteil);
 
     }
 
-    public Integer getBestandteileCount(){
-       return bestandteile.size();
+    public Integer getBestandteileCount() {
+        return bestandteile.size();
     }
 
-    public ArrayList<String> getBestandteile(){
+    public ArrayList<String> getBestandteile() {
         return bestandteile;
     }
 
@@ -217,34 +223,6 @@ public class ProgressStepsActivity extends AppCompatActivity {
         currentState = bestandteil;
 
 
-    }
-
-
-
-    public void saveOnFirebase(String uid) {
-        Map<String, Object> product = new HashMap<>();
-        product.put("Bezeichnung", bez);
-        product.put("UserID", uid);
-        product.put("Bestandteile", bestandteile);
-
-        db.collection("Produkte").document(ean)
-                .set(product)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
-                        ergebnisIntent.putExtra("EAN", ean);
-                        ergebnisIntent.putExtra("BEZ", bez);
-                        ergebnisIntent.putExtra("TEILE", bestandteile);
-                        startActivity(ergebnisIntent);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
     }
 
 
@@ -263,35 +241,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
         dialogBeenden();
     }
 
-    public void dialogBeenden(){
-
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        builder1.setTitle("Beenden?");
-        builder1.setMessage("Sicher, dass du den Vorgang abbrechen und auf den Start Bildschirm zurückkehren möchtest?");
-        builder1.setCancelable(true);
-
-        builder1.setPositiveButton(
-                "Ja, Sicher",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                        startActivity(intent);
-                    }
-                });
-        builder1.setNegativeButton(
-                "Abbrechen",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog alert = builder1.create();
-        alert.show();
-
-    }
-
-    public void dialogStart(){
+    public void dialogStart() {
 
         //CustomDialog
         //https://www.codingdemos.com/android-custom-dialog-animation/
@@ -311,7 +261,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
                 "ABBRECHEN",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
                     }
                 });
@@ -323,7 +273,37 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
-    public void dialogNewUser(){
+    public void dialogBeenden() {
+
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setTitle("Beenden?");
+        builder1.setMessage("Sicher, dass du den Vorgang abbrechen und auf den Start Bildschirm zurückkehren möchtest?");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ja, Sicher",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        builder1.setNegativeButton(
+                "Abbrechen",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder1.create();
+        alert.show();
+
+    }
+
+
+
+    public void dialogNewUser() {
 
         //CustomDialog
         //https://www.codingdemos.com/android-custom-dialog-animation/
@@ -341,11 +321,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         String benutzername = editTextBenutzername.getText().toString();
-                        if (!benutzername.isEmpty()){
-                            logIn(benutzername); //+saveUserOnFirebase
-                        }
-                        else{
-                            Toast.makeText(ProgressStepsActivity.this,"Denk dir einen Namen aus",Toast.LENGTH_LONG).show();
+                        if (!benutzername.isEmpty()) {
+                            logIn(benutzername); //+saveUserOnFirebase //+ saveOnFirebase //+saveProduct To User
+                        } else {
+                            Toast.makeText(ProgressStepsActivity.this, "Denk dir einen Namen aus", Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -357,11 +336,173 @@ public class ProgressStepsActivity extends AppCompatActivity {
     }
 
 
-    public boolean isNewUser(){
+    public void logIn(final String name) {
+        progress.setVisibility(View.VISIBLE);
+        if (isNewUser()== true) {
+            mAuth.signInAnonymously().addOnSuccessListener(ProgressStepsActivity.this, new OnSuccessListener<AuthResult>() {
+                @Override
+                public void onSuccess(AuthResult authResult) {
+                    String userID = authResult.getUser().getUid();
+                    saveUserOnFirebase(name, userID);
+                }
+
+             }).addOnFailureListener(ProgressStepsActivity.this, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
+    public void saveUserOnFirebase(final String benutzername, final String userID) {
+
+        Map<String, Object> user = new HashMap<>();
+        user.put("Benutzername", benutzername);
+        user.put("Punkte", 0);
+        user.put("Titel", "Müllmonster");
+        user.put("Produkte", eingetrageneProdukte);
+        db.collection("User").document(userID)
+                .set(user).addOnSuccessListener(this, new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                saveOnFirebase(userID);
+            }
+        }).addOnFailureListener(ProgressStepsActivity.this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progress.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    //Aufruf auch von Fragment
+    public void saveOnFirebase(final String uid) {
+        progress.setVisibility(View.VISIBLE);
+        Map<String, Object> product = new HashMap<>();
+        product.put("Bezeichnung", bez);
+        product.put("UserID", uid);
+        product.put("Bestandteile", bestandteile);
+
+        db.collection("Produkte").document(ean)
+                .set(product)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        saveProductToUser(uid);
+                    }
+                }).addOnFailureListener(ProgressStepsActivity.this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progress.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void saveProductToUser(final String uid) {
+        final DocumentReference docRef = db.collection("User").document(uid);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    eingetrageneProdukte = (ArrayList<String>) document.get("Produkte");
+                    //Bei Korrektur des eigenen Eintrags, soll Produkt nicht 2x vorkommen.
+                    if(!eingetrageneProdukte.contains(ean)){
+                        eingetrageneProdukte.add(ean);
+                    }
+                    long punkte = (long) document.get("Punkte");
+                    punkte = punkte + 50;
+                    String newTitel = getTitel(punkte);
+
+                    Map<String, Object> update = new HashMap<>();
+                    update.put("Produkte", eingetrageneProdukte);
+                    update.put("Punkte", punkte);
+                    update.put("Titel", newTitel);
+
+                    db.collection("User").document(uid)
+                            .update(update)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    if(creatorID != ""){
+                                        decreasePointsCreator();
+                                    }
+                                    else{
+                                        Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
+                                        ergebnisIntent.putExtra("EAN", ean);
+                                        ergebnisIntent.putExtra("BEZ", bez);
+                                        ergebnisIntent.putExtra("TEILE", bestandteile);
+                                        startActivity(ergebnisIntent);
+                                    }
+
+
+                                }
+                            });
+                }
+                progress.setVisibility(View.GONE);
+            }
+
+        });
+
+    }
+
+    public void decreasePointsCreator(){
+        final DocumentReference ref = db.collection("User").document(creatorID);
+        ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult();
+                    long punkte = (long) doc.get("Punkte");
+                    punkte = punkte - 25;
+                    String newTitel = getTitel(punkte);
+
+                    Map<String, Object> update = new HashMap<>();
+                    update.put("Punkte", punkte);
+                    update.put("Titel", newTitel);
+
+                    db.collection("User").document(creatorID).update(update).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
+                            ergebnisIntent.putExtra("EAN", ean);
+                            ergebnisIntent.putExtra("BEZ", bez);
+                            ergebnisIntent.putExtra("TEILE", bestandteile);
+                            startActivity(ergebnisIntent);
+                        }
+                    });
+                }
+            }
+        });
+    }
+    public String getTitel(long punkte){
+        if(punkte < 500){
+            return "Müllmonster";
+        }
+        else if (punkte >= 500 && punkte < 1500){
+            return "Schrottsammler";
+        }
+        else if (punkte >= 1500 && punkte <2500){
+            return "Sprössling";
+        }
+        else if (punkte >=2500 && punkte <3500){
+            return "Recycler";
+        }
+        else if (punkte >= 3500 && punkte <4500){
+            return "Klimaheld";
+        }
+        else if(punkte >= 4500){
+            return "Umweltaktivist";
+        }
+        else return "Mülmonster";
+    }
+
+    public boolean isNewUser() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if ( currentUser == null){
+        if (currentUser == null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -371,32 +512,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
         String uid = currentUser.getUid();
         return uid;
     }
-    public void logIn(final String name){
-        if(isNewUser() == true){
-            mAuth.signInAnonymously().addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
-                @Override
-                public void onSuccess(AuthResult authResult) {
-                    String userID = mAuth.getCurrentUser().getUid();
-                    saveUserOnFirebase(name, userID);
-                }
-            });
-        }
+
+    public String getBezeichnung(){
+        return bezeichnung;
     }
-
-    public void saveUserOnFirebase(final String benutzername, final String userID){
-        Map<String, Object> user = new HashMap<>();
-        user.put("UserID", userID);
-        user.put("Benutzername", benutzername);
-        db.collection("User").document(userID)
-                .set(user).addOnSuccessListener(this, new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                saveOnFirebase(userID);
-            }
-        });
-    }
-
-
 
 }
 
