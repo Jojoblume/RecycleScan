@@ -425,7 +425,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    if(creatorID != ""){
+                                    if(!creatorID.equals("")){
                                         decreasePointsCreator();
                                     }
                                     else{
@@ -433,6 +433,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
                                         ergebnisIntent.putExtra("EAN", ean);
                                         ergebnisIntent.putExtra("BEZ", bez);
                                         ergebnisIntent.putExtra("TEILE", bestandteile);
+                                        ergebnisIntent.putExtra("ACTIVITY", "Main");
                                         startActivity(ergebnisIntent);
                                     }
 
@@ -454,24 +455,28 @@ public class ProgressStepsActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot doc = task.getResult();
-                    long punkte = (long) doc.get("Punkte");
-                    punkte = punkte - 25;
-                    String newTitel = getTitel(punkte);
+                    if(doc.exists()){
+                        long punkte = (long) doc.get("Punkte");
+                        punkte = punkte - 25;
+                        String newTitel = getTitel(punkte);
 
-                    Map<String, Object> update = new HashMap<>();
-                    update.put("Punkte", punkte);
-                    update.put("Titel", newTitel);
+                        Map<String, Object> update = new HashMap<>();
+                        update.put("Punkte", punkte);
+                        update.put("Titel", newTitel);
 
-                    db.collection("User").document(creatorID).update(update).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
-                            ergebnisIntent.putExtra("EAN", ean);
-                            ergebnisIntent.putExtra("BEZ", bez);
-                            ergebnisIntent.putExtra("TEILE", bestandteile);
-                            startActivity(ergebnisIntent);
-                        }
-                    });
+                        db.collection("User").document(creatorID).update(update).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
+                                ergebnisIntent.putExtra("EAN", ean);
+                                ergebnisIntent.putExtra("BEZ", bez);
+                                ergebnisIntent.putExtra("TEILE", bestandteile);
+                                ergebnisIntent.putExtra("ACTIVITY", "ProgressSteps");
+                                startActivity(ergebnisIntent);
+                            }
+                        });
+                    }
+
                 }
             }
         });

@@ -84,6 +84,7 @@ public static final String TAG = "MyActivity";
                                         ergebnisIntent.putExtra("EAN", ean);
                                         String bezeichnung = document.get("Bezeichnung").toString();
                                         ergebnisIntent.putExtra("BEZ", bezeichnung);
+                                        ergebnisIntent.putExtra("ACTIVITY", "Main");
                                         ArrayList<String> array = (ArrayList<String>) document.get("Bestandteile");
                                         Log.d(TAG, array.toString());
 

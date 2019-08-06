@@ -1,15 +1,22 @@
 package com.example.jojo.recyclescan;
 
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,6 +25,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ProfilActivity extends AppCompatActivity {
 
@@ -33,6 +41,8 @@ public class ProfilActivity extends AppCompatActivity {
     ImageView img_titel;
     ProgressBar progress;
 
+    MyGridView sammlung;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +55,7 @@ public class ProfilActivity extends AppCompatActivity {
         textPointsMax = findViewById(R.id.textViewPointsMax);
         img_titel = findViewById(R.id.imageViewTitel);
         progress = findViewById(R.id.progressPoints);
+        sammlung = findViewById(R.id.gridView);
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -106,12 +117,42 @@ public class ProfilActivity extends AppCompatActivity {
                     progress.setVisibility(View.VISIBLE);
 
                     ArrayList<String> produkte = (ArrayList<String>) document.get("Produkte");
+                    Collections.reverse(produkte);
+                    CustomGridAdapter adapter = new CustomGridAdapter(ProfilActivity.this, produkte);
+                    sammlung.setAdapter(adapter);
+
+                    sammlung.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            final String ean = sammlung.getItemAtPosition(position).toString();
+                            DocumentReference docRef = db.collection("Produkte").document(ean);
+                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        String bezeichnung = (String) document.get("Bezeichnung");
+                                        ArrayList<String> bestandteile = (ArrayList<String>) document.get("Bestandteile");
+
+                                        Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
+                                        ergebnisIntent.putExtra("EAN", ean);
+                                        ergebnisIntent.putExtra("BEZ", bezeichnung);
+                                        ergebnisIntent.putStringArrayListExtra("TEILE", bestandteile);
+                                        ergebnisIntent.putExtra("ACTIVITY", "Profil");
+                                        startActivity(ergebnisIntent);
+                                    }
+
+                                }
+                            });
+                        }
+                    });
 
                 }
             }
         });
 
     }
+
 
     private void setImage(String titel) {
         if (titel.equals("Müllmonster")){

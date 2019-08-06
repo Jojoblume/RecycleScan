@@ -160,6 +160,11 @@ public class ErgebnisActivity extends AppCompatActivity {
                     hinweisText.setText("Kartons / Briefe mit Plastik Sichtfenster gehören ins Altpapier. Der Kunststoffanteil ist verkraftbar und für die Weiterverarbeitung als Recyclingpapier unerheblich.");
                     cardView.setVisibility(View.VISIBLE);
                 }
+                else if (array.get(i).contains("Glas")){
+                    hinweis.setText("Hinweis: Glas Verschluss");
+                    hinweisText.setText("Moderne Müllanlagen können Deckel aussortieren. Trotzdem können Verschlüsse auch in den Gelben Sack und die gelbe Tonne geworfen werden.");
+                    cardView.setVisibility(View.VISIBLE);
+                }
             }
         }
 
