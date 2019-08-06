@@ -85,48 +85,39 @@ public class ProfilActivity extends AppCompatActivity {
                     ArrayList<String> produkte = (ArrayList<String>) document.get("Produkte");
                     //Umkehren, damit neue Produkte oben stehen.
                     Collections.reverse(produkte);
-                    setSammlung(produkte);
+
+                    CustomGridAdapter adapter = new CustomGridAdapter(ProfilActivity.this, produkte);
+                    sammlung.setAdapter(adapter);
+                    sammlung.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            final String ean = sammlung.getItemAtPosition(position).toString();
+                            DocumentReference docRef = db.collection("Produkte").document(ean);
+                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        String bezeichnung = (String) document.get("Bezeichnung");
+                                        ArrayList<String> bestandteile = (ArrayList<String>) document.get("Bestandteile");
+
+                                        Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
+                                        ergebnisIntent.putExtra("EAN", ean);
+                                        ergebnisIntent.putExtra("BEZ", bezeichnung);
+                                        ergebnisIntent.putStringArrayListExtra("TEILE", bestandteile);
+                                        ergebnisIntent.putExtra("ACTIVITY", "Profil");
+                                        startActivity(ergebnisIntent);
+                                    }
+
+                                }
+                            });
+                        }
+                    });
 
                 }
             }
         });
 
-    }
-
-    /**
-     * Sammlung wird erstellt und bei Klick auf Item gelangt der Benutzer zur ErgebnisActivity.
-     * @param produkte
-     */
-    private void setSammlung(ArrayList<String> produkte) {
-
-        CustomGridAdapter adapter = new CustomGridAdapter(ProfilActivity.this, produkte);
-        sammlung.setAdapter(adapter);
-
-        sammlung.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final String ean = sammlung.getItemAtPosition(position).toString();
-                DocumentReference docRef = db.collection("Produkte").document(ean);
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            String bezeichnung = (String) document.get("Bezeichnung");
-                            ArrayList<String> bestandteile = (ArrayList<String>) document.get("Bestandteile");
-
-                            Intent ergebnisIntent = new Intent(getApplicationContext(), ErgebnisActivity.class);
-                            ergebnisIntent.putExtra("EAN", ean);
-                            ergebnisIntent.putExtra("BEZ", bezeichnung);
-                            ergebnisIntent.putStringArrayListExtra("TEILE", bestandteile);
-                            ergebnisIntent.putExtra("ACTIVITY", "Profil");
-                            startActivity(ergebnisIntent);
-                        }
-
-                    }
-                });
-            }
-        });
     }
 
     /**
