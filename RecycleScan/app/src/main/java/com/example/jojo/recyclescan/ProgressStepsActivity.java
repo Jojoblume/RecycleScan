@@ -1,9 +1,7 @@
 package com.example.jojo.recyclescan;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +13,15 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.jojo.fragments.FragmentBestatigen;
+import com.example.jojo.fragments.FragmentBezeichnung;
+import com.example.jojo.fragments.FragmentFrageCode;
+import com.example.jojo.fragments.FragmentFrageMehr;
+import com.example.jojo.fragments.FragmentFrageSichtfenster;
+import com.example.jojo.fragments.FragmentFrageVerschluss;
+import com.example.jojo.fragments.FragmentListeCode;
+import com.example.jojo.fragments.FragmentListeGlas;
+import com.example.jojo.fragments.FragmentSingleChoiceList;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ProgressStepsActivity extends AppCompatActivity {
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseAuth mAuth;
 
     StepView stepView;
     ProgressBar progress;
@@ -50,12 +55,16 @@ public class ProgressStepsActivity extends AppCompatActivity {
     String bezeichnung = "";
     String creatorID = "";
 
+    //Firebase
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth;
 
     List<String> gelb = new ArrayList<>();
     List<String> pap = new ArrayList<>();
 
     boolean verschlussGefragt = false;
 
+    //FRAGMENTE
     Fragment fragmentBezeichnung;
     Fragment fragmentList;
     Fragment fragmentBestätigen;
@@ -76,20 +85,25 @@ public class ProgressStepsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_progress_steps);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        //Listen erforderlich, um zu erkennen, welcher Bestandteil ausgewählt wurde.
+        gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
+        pap = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteilePap));
+
+        //Je nach vorheriger Activity wird der DialogStart angezeigt oder nicht.
         String previousActivity = getIntent().getExtras().getString("INTENT");
         if (previousActivity.equals("MainActivity")){
             dialogStart();
-        }else if (previousActivity.equals("ErgebnisActivity")){
+        }
+        //Hier handelt es sich um eine Korrektur. Bezeichnung wird übernommen und Creator ID ermittelt, um Punkte abziehen zu können.
+        else if (previousActivity.equals("ErgebnisActivity")){
             bezeichnung = getIntent().getExtras().getString("BEZ");
             creatorID = getIntent().getExtras().getString("CREATOR");
         }
 
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-
-        progress = findViewById(R.id.progressBar);
-        progress.setVisibility(View.INVISIBLE);
-
+        //FRAGMENTE
         fragmentBezeichnung = new FragmentBezeichnung();
         fragmentList = new FragmentSingleChoiceList();
         fragmentBestätigen = new FragmentBestatigen();
@@ -102,27 +116,28 @@ public class ProgressStepsActivity extends AppCompatActivity {
         fragmentListeCode = new FragmentListeCode();
         fragmentListeGlas = new FragmentListeGlas();
 
-        gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
-        pap = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteilePap));
-
+        //Hier Datenübertragung mit Bundle.
+        //Später waren Methoden einfacher zu handhaben.
         ean = getIntent().getExtras().getString("EAN");
         Bundle bundle = new Bundle();
         bundle.putString("EAN", ean);
         fragmentBezeichnung.setArguments(bundle);
 
+        //Anzeige des Fortschritts
         stepNames.add("Bezeichnung");
         stepNames.add("Bestandteile");
         stepNames.add("Bestätigen");
         stepView = findViewById(R.id.stepView);
         stepView.setSteps(stepNames);
 
+        //Lade-prozess
+        progress = findViewById(R.id.progressBar);
+        progress.setVisibility(View.INVISIBLE);
+
+        //Erstes Fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBezeichnung).commit();
 
-
-
-
     }
-
 
     /**
      * Hier Entscheidung, welches Fragment als nächstes angezeigt werden muss.
@@ -134,12 +149,15 @@ public class ProgressStepsActivity extends AppCompatActivity {
         //https://stackoverflow.com/questions/9294603/how-do-i-get-the-currently-displayed-fragment
         //Fragment myFragment = getSupportFragmentManager().findFragmentByTag("FRAGMENTBEZ");
 
+        //Nach dem 1. Fragment folgt das Fragment mit der Liste der Bestandteile.
         if (fragmentBezeichnung != null && fragmentBezeichnung.isVisible()) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
             goStep();
         }
+
         //1.EBENE
         else if (fragmentList != null && fragmentList.isVisible()) {
+            //Ermittlung, was ausgewählt wurde und je nach dem weiteres Fragment.
             //GELB?
             if (gelb.contains(currentState)) {
                 if (verschlussGefragt == false) {
@@ -164,7 +182,11 @@ public class ProgressStepsActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageCode).commit();
             }
 
-        } else if (fragmentListeGlas != null && fragmentListeGlas.isVisible()) {
+        }
+        //2.EBENE
+
+        //Nachdem die Glasfarbe ermittelt wurde, wird nach Verschluss oder Mehr gefragt.
+        else if (fragmentListeGlas != null && fragmentListeGlas.isVisible()) {
             if (verschlussGefragt == false) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageVerschluss).commit();
                 verschlussGefragt = true;
@@ -173,12 +195,12 @@ public class ProgressStepsActivity extends AppCompatActivity {
             }
 
         }
-        //2.EBENE
+        //Je nach Antwort, werden RecyclingCodes angezeigt oder nach weiteren Bestandteilen gefragt.
         else if (fragmentFrageCode != null && fragmentFrageCode.isVisible()) {
             if (currentState.equals("CodeJa")) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentListeCode).commit();
             } else {
-                //Leeres Feld mit Fragezeichen oder so darstellen?
+                //Leeres Feld mit Fragezeichen darstellen?
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentFrageMehr).commit();
             }
         }
@@ -188,7 +210,9 @@ public class ProgressStepsActivity extends AppCompatActivity {
         else if (currentState.equals("ENDE")) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentBestätigen).commit();
             goStep();
-        } else if (currentState.equals("MehrJa")) {
+        }
+        //Wenn bei Frage Mehr? "JA" ausgewählt wird:
+        else if (currentState.equals("MehrJa")) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragmentList).commit();
         }
         //Im Zweifel immer fragen, ob es noch mehr Bestandteile gibt
@@ -198,49 +222,85 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
-    public void goStep() {
+    public void goStep()
+    {
         stepView.go(stepView.getCurrentStep() + 1, true);
     }
 
-    public void getBezeichnung(String data) {
+    public void getBezeichnung(String data)
+    {
         bez = data;
     }
 
-    public void addBestandteil(String bestandteil) {
+    public void addBestandteil(String bestandteil)
+    {
         bestandteile.add(bestandteil);
 
     }
 
-    public Integer getBestandteileCount() {
+    public Integer getBestandteileCount()
+    {
         return bestandteile.size();
     }
 
-    public ArrayList<String> getBestandteile() {
+    public ArrayList<String> getBestandteile()
+    {
         return bestandteile;
     }
 
-    public void setCurrentState(String bestandteil) {
+    public void setCurrentState(String bestandteil)
+    {
         currentState = bestandteil;
-
-
     }
 
+    public String getBezeichnung(){
+        return bezeichnung;
+    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                dialogBeenden();
-                return true;
+    public String getTitel(long punkte){
+        if(punkte < 500){
+            return "Müllmonster";
         }
-        return super.onOptionsItemSelected(item);
+        else if (punkte >= 500 && punkte < 1500){
+            return "Schrottsammler";
+        }
+        else if (punkte >= 1500 && punkte <2500){
+            return "Sprössling";
+        }
+        else if (punkte >=2500 && punkte <3500){
+            return "Recycler";
+        }
+        else if (punkte >= 3500 && punkte <4500){
+            return "Klimaheld";
+        }
+        else if(punkte >= 4500){
+            return "Umweltaktivist";
+        }
+        else return "Mülmonster";
     }
 
-    @Override
-    public void onBackPressed() {
-        dialogBeenden();
+    public boolean isNewUser() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    public String getUserID() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String uid = currentUser.getUid();
+        return uid;
+    }
+
+    /**
+     * START DIALOGFENSTER
+     */
+
+    /**
+     * Dialog, der beim Start angezeigt wird. Designmuster Bundling mit Waschbär Bild.
+     */
     public void dialogStart() {
 
         //CustomDialog
@@ -273,6 +333,9 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Dialog, der den Benutzer fragt, ob er den Vorgang wirklich Beenden möchte.
+     */
     public void dialogBeenden() {
 
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
@@ -301,8 +364,9 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
-
-
+    /**
+     * Dialog, der angezeigt wird, wenn der Benutzer noch nicht eingeloggt ist -> also ein neuer Benutzer ist.
+     */
     public void dialogNewUser() {
 
         //CustomDialog
@@ -335,7 +399,14 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * START FIREBASE
+     */
 
+    /**
+     * 1. Methode, die aufgerufen wird, wenn ein neuer Benutzer das 1. Produkt Veröffentlicht.
+     * @param name
+     */
     public void logIn(final String name) {
         progress.setVisibility(View.VISIBLE);
         if (isNewUser()== true) {
@@ -355,6 +426,13 @@ public class ProgressStepsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 2. Methode, die bei einem neuen Benutzer ausgeührt wird.
+     * Eine neue Sammlung "User" wurde erstellt und die Daten des Benutzers werden dieser Sammlung hinzugefügt.
+     * Somit später Verbindung zwischen Benutzern und eingetragenen Produkten.
+     * @param benutzername
+     * @param userID
+     */
     public void saveUserOnFirebase(final String benutzername, final String userID) {
 
         Map<String, Object> user = new HashMap<>();
@@ -376,7 +454,12 @@ public class ProgressStepsActivity extends AppCompatActivity {
         });
     }
 
-    //Aufruf auch von Fragment
+    /**
+     * Speichert Produkt auf Firebase.
+     * Wenn neuer Nutzer: 3. Methode, die aufgerufen wird.
+     * Wenn eingeloggter Nutzer: 1. Methode, die aufgerufen wird.
+     * @param uid
+     */
     public void saveOnFirebase(final String uid) {
         progress.setVisibility(View.VISIBLE);
         Map<String, Object> product = new HashMap<>();
@@ -399,6 +482,11 @@ public class ProgressStepsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Speichert die EAN des eingetragenen Produkts zugehörig zum Benutzer.
+     * Außerdem erhählt hier der Benutzer 50 Punkte für den Eintrag und erhält ggf. einen neuen Titel.
+     * @param uid
+     */
     public void saveProductToUser(final String uid) {
         final DocumentReference docRef = db.collection("User").document(uid);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -448,6 +536,10 @@ public class ProgressStepsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Methode, die Aufgerufen wird, wenn es sich um eine Korrektur handelt.
+     * Die Punkte des Erstellers werden abgezogen und ggf der neue Titel aktualisiert.
+     */
     public void decreasePointsCreator(){
         final DocumentReference ref = db.collection("User").document(creatorID);
         ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -481,45 +573,21 @@ public class ProgressStepsActivity extends AppCompatActivity {
             }
         });
     }
-    public String getTitel(long punkte){
-        if(punkte < 500){
-            return "Müllmonster";
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                dialogBeenden();
+                return true;
         }
-        else if (punkte >= 500 && punkte < 1500){
-            return "Schrottsammler";
-        }
-        else if (punkte >= 1500 && punkte <2500){
-            return "Sprössling";
-        }
-        else if (punkte >=2500 && punkte <3500){
-            return "Recycler";
-        }
-        else if (punkte >= 3500 && punkte <4500){
-            return "Klimaheld";
-        }
-        else if(punkte >= 4500){
-            return "Umweltaktivist";
-        }
-        else return "Mülmonster";
+        return super.onOptionsItemSelected(item);
     }
 
-    public boolean isNewUser() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getUserID() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        String uid = currentUser.getUid();
-        return uid;
-    }
-
-    public String getBezeichnung(){
-        return bezeichnung;
+    @Override
+    public void onBackPressed() {
+        dialogBeenden();
     }
 
 }

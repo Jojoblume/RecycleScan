@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.helpers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.jojo.recyclescan.R;
 
 import java.util.ArrayList;
 import java.util.List;

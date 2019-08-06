@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.helpers;
 
 import com.journeyapps.barcodescanner.CaptureActivity;
 

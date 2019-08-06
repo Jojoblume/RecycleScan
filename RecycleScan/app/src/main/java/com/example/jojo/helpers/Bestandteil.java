@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.helpers;
 
 /**
  * Klasse Bestandteil für MyAdapter. Ein Bestandteil in der ListView besteht aus einem Namen und einem Bild.

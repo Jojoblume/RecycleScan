@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,7 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class FragmentFrageCode extends Fragment {
+import com.example.jojo.recyclescan.ProgressStepsActivity;
+import com.example.jojo.recyclescan.R;
+
+/**
+ * Fragment, das nachfragt, ob es noch mehr Bestandteile an der Verpackung vorhanden sind.
+ */
+public class FragmentFrageMehr extends Fragment {
 
     View view;
 
@@ -19,7 +25,7 @@ public class FragmentFrageCode extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_frage_code, container, false);
+        view = inflater.inflate(R.layout.fragment_frage_mehr, container, false);
 
         ja = view.findViewById(R.id.buttonJa);
         nein = view.findViewById(R.id.buttonNein);
@@ -27,18 +33,15 @@ public class FragmentFrageCode extends Fragment {
         ja.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ProgressStepsActivity)getActivity()).setCurrentState("CodeJa");
+                ((ProgressStepsActivity)getActivity()).setCurrentState("MehrJa");
                 ((ProgressStepsActivity)getActivity()).getFragment();
-                /**getActivity().getSupportFragmentManager().beginTransaction()
-                 .replace(R.id.fragmentContainer, fragmentÜbersicht)
-                 .commit();**/
             }
         });
 
         nein.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ProgressStepsActivity)getActivity()).setCurrentState("CodeNein");
+                ((ProgressStepsActivity)getActivity()).setCurrentState("ENDE");
                 ((ProgressStepsActivity)getActivity()).getFragment();
 
             }

@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.helpers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,6 +8,14 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.GridView;
 
+import com.example.jojo.recyclescan.R;
+
+/**
+ * Eigene GridView für die Darstellung der Regalbretter.
+ * https://stackoverflow.com/questions/6734635/background-scrolling-with-item-in-gridview/9757501#9757501
+ * Shelves By Romain Guy
+ * https://code.google.com/archive/p/shelves/
+ */
 public class MyGridView extends GridView {
 
     private Bitmap background;

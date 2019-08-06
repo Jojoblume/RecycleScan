@@ -1,10 +1,7 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.helpers;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.jojo.recyclescan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -21,13 +18,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
+/**
+ * Adapter für GridView.
+ * Bild wird zufällig ausgewählt und Produktname wird für jedes einzelne Item von Firebase abgefragt.
+ */
 public class CustomGridAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
     private List<String> produkte;
     private Context context;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String produktname = "Marshmallow";
+    private String produktname = "";
 
     public CustomGridAdapter(Context context, List<String> produkte){
         this.context = context;
@@ -58,7 +59,7 @@ public class CustomGridAdapter extends BaseAdapter {
             listItem = inflater.inflate(R.layout.grid_item, parent, false);
 
 
-        ImageView image = (ImageView)listItem.findViewById(R.id.imageViewProduct);
+        ImageView image = listItem.findViewById(R.id.imageViewProduct);
         int zahl = (int) (Math.random()*3+1);
         if ( zahl <2){
             image.setImageResource(R.mipmap.marshmallow);
@@ -70,11 +71,13 @@ public class CustomGridAdapter extends BaseAdapter {
             image.setImageResource(R.mipmap.pretzel);
 
         }
-        //Macht einzelne Regalbretter
+
+        //Statt Klasse "MyGridView", könnte auch folgender Code benutzt werden.
+        //Dann werden jedoch die Regalbretter einzeln für jedes Item angezeigt und nicht über die ganze Länge.
         //listItem.setBackgroundResource(R.mipmap.newshelf);
 
 
-        final TextView name = (TextView) listItem.findViewById(R.id.textViewProduktname);
+        final TextView name = listItem.findViewById(R.id.textViewProduktname);
         String ean = getItem(position).toString();
 
         final DocumentReference docRef = db.collection("Produkte").document(ean);

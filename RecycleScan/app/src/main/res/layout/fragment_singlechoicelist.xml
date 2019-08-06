@@ -42,7 +42,7 @@
             android:orientation="vertical">
 
 
-            <com.example.jojo.recyclescan.MyListView
+            <com.example.jojo.helpers.MyListView
                 android:id="@+id/listViewBes1"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />

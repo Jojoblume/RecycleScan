@@ -6,6 +6,10 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * Bildschirm, um die Spierlstatistiken des Erstellers des Produkts anzuzeigen.
+ * (Titel, Benutzername, Punkte und Anzahl eingetragener Produkte)
+ */
 public class CreatorActivity extends AppCompatActivity {
 
     TextView textBenutzername;
@@ -37,6 +41,11 @@ public class CreatorActivity extends AppCompatActivity {
         int anzahl = getIntent().getExtras().getInt("ANZAHLPRODUKTE");
         textAnzahl.setText(anzahl + " eingetragene Produkte");
 
+        getImage(titel);
+
+    }
+
+    private void getImage(String titel) {
         img_titel = findViewById(R.id.imageViewTitel);
         if (titel.equals("Müllmonster")){
             //Icon made by Freepik from www.flaticon.com
@@ -64,13 +73,7 @@ public class CreatorActivity extends AppCompatActivity {
             //Umweltaktivist
             //Icon made by Freepik from www.flaticon.com
             img_titel.setImageResource(R.drawable.umweltaktivist);
-
         }
-
-
-
-
-
     }
 
     @Override

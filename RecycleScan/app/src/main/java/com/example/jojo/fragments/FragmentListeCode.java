@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,11 +13,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.jojo.recyclescan.ProgressStepsActivity;
+import com.example.jojo.recyclescan.R;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Fragment, das die Liste der Recycling Codes anzeigt.
+ */
 public class FragmentListeCode extends Fragment {
 
     View view;

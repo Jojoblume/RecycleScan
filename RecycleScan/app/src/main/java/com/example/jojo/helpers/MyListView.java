@@ -1,12 +1,12 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.helpers;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ListView;
 
 /**
- * Eigene ListView, damit Auflistung der Bestandteile in NewProductActivity.class so hoch ist, wie nötig.
- * Ansonsten, wenn nur height: wrap_content, wurde nur das erste Item angezeigt und die anderen Items befanden sich
+ * Eigene ListView, damit ListView nur so hoch ist, wie nötig.
+ * Ansonsten, wenn nur height: wrap_content, wurde nur das erste Item angezeigt und die anderen Items befinden sich
  * unsichtbar als ScrollView darunter.
  * (Siehe Methode OnMeasure)
  */

@@ -27,12 +27,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Portrait"
+            android:name="com.example.jojo.helpers.Portrait"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".ErgebnisActivity" />
-        <activity android:name=".NewProductActivity" />
     </application>
 
 </manifest>

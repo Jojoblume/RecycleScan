@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,10 +13,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.example.jojo.recyclescan.ProgressStepsActivity;
+import com.example.jojo.recyclescan.R;
+
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Fragment wird angezeigt, nachdem "Glas" ausgewählt wurde.
+ * Frage nach der Glasfarbe.
+ */
 public class FragmentListeGlas extends Fragment {
 
     View view;

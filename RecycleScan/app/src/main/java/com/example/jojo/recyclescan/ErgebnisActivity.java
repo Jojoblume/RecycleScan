@@ -11,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.jojo.helpers.Bestandteil;
+import com.example.jojo.helpers.MyAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,12 +40,16 @@ public class ErgebnisActivity extends AppCompatActivity {
     TextView textKorrigieren;
     ListView lv;
 
+    //Hinweis
     CardView cardView;
     TextView hinweis;
     TextView hinweisText;
 
-    private MyAdapter mAdapter;
+    //Liste Bestandteile
+    ArrayList<String> array;
 
+    //Listen für Zuordnung
+    private MyAdapter mAdapter;
     List<String> gelb = new ArrayList<>();
     List<String> gelbCode = new ArrayList<>();
     List<String> glas = new ArrayList<>();
@@ -51,12 +57,17 @@ public class ErgebnisActivity extends AppCompatActivity {
     List<String> pap = new ArrayList<>();
     List<String> papCode = new ArrayList<>();
 
+
+    //Firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    //Firebase Current User
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
     String currentUserID;
     String currentUserTitel;
 
+    //Ersteller des Produkteintrags.
     String creatorUID;
     Intent creatorDataIntent;
 
@@ -66,15 +77,26 @@ public class ErgebnisActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ergebnis);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        array = getIntent().getStringArrayListExtra("TEILE");
+
+        //Zuordnungslisten
+        gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
+        gelbCode = Arrays.asList(getResources().getStringArray(R.array.arrayCodesGelb));
+        glas = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGlas));
+        glasCode = Arrays.asList(getResources().getStringArray(R.array.arrayCodesGlas));
+        pap = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteilePap));
+        papCode = Arrays.asList(getResources().getStringArray(R.array.arrayCodesPap));
+
         textEAN = findViewById(R.id.textViewEAN2);
         final String ean = getIntent().getExtras().getString("EAN");
         textEAN.setText(ean);
 
-        giveUserPoints(ean);
-
         textBez = findViewById(R.id.textViewBez);
         final String bezeichnung = getIntent().getExtras().getString("BEZ");
         textBez.setText(bezeichnung);
+
+        //Punkte geben
+        giveUserPoints(ean);
 
         //Korrektur nur möglich, wenn es der eigene Eintrag ist, oder der Eintrag alt ist (anonym) oder der Titel des Creators geringer ist
         //als der Titel des aktuellen Benutzers.
@@ -100,6 +122,7 @@ public class ErgebnisActivity extends AppCompatActivity {
             }
         });
 
+        //CreatorActivity wird bei Klick auf Benutzername gestartet.
         textViewBenutzername.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,25 +140,62 @@ public class ErgebnisActivity extends AppCompatActivity {
                 intentKorrigieren.putExtra("EAN", ean);
                 intentKorrigieren.putExtra("INTENT", "ErgebnisActivity");
                 intentKorrigieren.putExtra("BEZ", bezeichnung);
+                //CreatorID wird übergeben, damit ihm Punkte abgezogen werden können.
                 intentKorrigieren.putExtra("CREATOR", creatorUID);
                 startActivity(intentKorrigieren);
             }
         });
 
+        setHinweistext(bezeichnung);
 
+        bestandteileZuordnen();
 
+    }
 
+    /**
+     * Liste der Bestandteile mit richtigem Bild
+     * Bei Klick auf Item Start InfoTonneActivity.
+     */
+    private void bestandteileZuordnen() {
 
-        gelb = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGelb));
-        gelbCode = Arrays.asList(getResources().getStringArray(R.array.arrayCodesGelb));
-        glas = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteileGlas));
-        glasCode = Arrays.asList(getResources().getStringArray(R.array.arrayCodesGlas));
-        pap = Arrays.asList(getResources().getStringArray(R.array.arrayBestandteilePap));
-        papCode = Arrays.asList(getResources().getStringArray(R.array.arrayCodesPap));
+        ArrayList<Bestandteil> newArray = new ArrayList<>();
+        int drawable;
 
-        ArrayList<String> array = getIntent().getStringArrayListExtra("TEILE");
-        lv = (ListView) findViewById(R.id.lvBes);
+        for ( int i = 0; i < array.size(); i++){
+            if ( ! array.get(i).equals("")){
+                drawable = getTonne(array.get(i));
+                newArray.add(new Bestandteil(drawable, array.get(i)));
+            }
+        }
 
+        lv = findViewById(R.id.lvBes);
+        mAdapter = new MyAdapter(this,newArray);
+        lv.setAdapter(mAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ErgebnisActivity.this, InfoTonneActivity.class);
+                String name = mAdapter.getName(position);
+                if ( gelb.contains(name) || gelbCode.contains(name)){
+                    intent.putExtra("TONNE", "gelb");
+                }
+                else if ( glas.contains(name) || glasCode.contains(name)){
+                    intent.putExtra("TONNE", "glas");
+                }
+                else if ( pap.contains(name) || papCode.contains(name)){
+                    intent.putExtra("TONNE", "pap");
+                }
+                startActivity(intent);
+            }
+        });
+    }
+
+    /**
+     * Je nachdem, werden besondere Hinweistexte angezeigt.
+     * @param bezeichnung
+     */
+    private void setHinweistext(String bezeichnung) {
         // Sichtbarkeit der Hinweistexte. Jeweils nur 1 Hinweis. Verpackungen mit mehr als 1 Hinweis unwahrscheinlich.
         // Falls doch, wird der Joghurt Hinweis angezeigt.
         cardView = findViewById(R.id.cardView);
@@ -167,40 +227,12 @@ public class ErgebnisActivity extends AppCompatActivity {
                 }
             }
         }
-
-        ArrayList<Bestandteil> newArray = new ArrayList<>();
-        int drawable;
-
-        for ( int i = 0; i < array.size(); i++){
-            if ( ! array.get(i).equals("")){
-                drawable = getTonne(array.get(i));
-                newArray.add(new Bestandteil(drawable, array.get(i)));
-            }
-        }
-
-        mAdapter = new MyAdapter(this,newArray);
-        lv.setAdapter(mAdapter);
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ErgebnisActivity.this, InfoTonneActivity.class);
-                String name = mAdapter.getName(position);
-                if ( gelb.contains(name) || gelbCode.contains(name)){
-                    intent.putExtra("TONNE", "gelb");
-                }
-                else if ( glas.contains(name) || glasCode.contains(name)){
-                    intent.putExtra("TONNE", "glas");
-                }
-                else if ( pap.contains(name) || papCode.contains(name)){
-                    intent.putExtra("TONNE", "pap");
-                }
-                startActivity(intent);
-            }
-        });
-
     }
 
+    /**
+     * Die Daten des Erstellers von Firebase holen.
+     * Ermittlung, ob Ersteller höheren Rang hat.
+     */
     private void getCreatorData(){
         if (creatorUID.equals("")){
             textViewBenutzername.setText("Anonym");
@@ -254,6 +286,11 @@ public class ErgebnisActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Der Benutzer erhält 5 Punkte, wenn er ein Produkt scannt, das sich bereits in der Datenbank befindet.
+     * Er erhält die Punkte NICHT, wenn er ein eigenes Produkt scannt.
+     * @param ean
+     */
     private void giveUserPoints(final String ean) {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -267,8 +304,6 @@ public class ErgebnisActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
-                        //Ermittlung des Titels für Anzeige später wichtig.
-                        currentUserTitel = (String) document.get("Titel");
 
                         long punkte = (long) document.get("Punkte");
                         ArrayList<String> eigeneEANs = (ArrayList<String>) document.get("Produkte");
@@ -285,11 +320,39 @@ public class ErgebnisActivity extends AppCompatActivity {
                             db.collection("User").document(currentUserID).update(data);
                         }
 
+                        //Titel für später wichtig.
+                        //Ermittlung, ob Ersteller höheren Rang hat.
+                        currentUserTitel = (String) document.get("Titel");
+
                     }
                 }
             });
 
         }
+    }
+
+    /**
+     * Zuordnung get Image
+     */
+    public int getTonne(String bes){
+
+        if ( gelb.contains(bes) || gelbCode.contains(bes)){
+            return R.drawable.trash;
+        }
+        else if(glas.contains(bes) || glasCode.contains(bes)){
+            if (bes.equals(getString(R.string.farblos)) || bes.equals(getString(R.string.farblosCode))){
+                return R.drawable.glass_white; //farblos
+            } else if (bes.equals(getString(R.string.gruen)) || bes.equals(getString(R.string.anders)) || bes.equals(getString(R.string.gruenCode))) {
+                return R.drawable.glass_green; //grün
+            }
+            else if ( bes.equals(getString(R.string.braun)) || bes.equals(getString(R.string.braunCode))){
+                return R.drawable.glass_brown; //braun
+            }
+        }
+        else if(pap.contains(bes) || papCode.contains(bes)){
+            return R.drawable.paper;
+        }
+        return -1;
     }
 
     public String getTitel(long punkte){
@@ -314,45 +377,11 @@ public class ErgebnisActivity extends AppCompatActivity {
         else return "Mülmonster";
     }
 
-
-    //Gibt int zurück, da die Images R.drawable.. den Datentyp Integer haben.
-    public int getTonne(String bes){
-
-        if ( gelb.contains(bes) || gelbCode.contains(bes)){
-            return R.drawable.trash;
-        }
-        else if(glas.contains(bes) || glasCode.contains(bes)){
-            if (bes.equals(getString(R.string.farblos)) || bes.equals(getString(R.string.farblosCode))){
-                return R.drawable.glass_white; //farblos
-            } else if (bes.equals(getString(R.string.gruen)) || bes.equals(getString(R.string.anders)) || bes.equals(getString(R.string.gruenCode))) {
-                return R.drawable.glass_green; //grün
-            }
-            else if ( bes.equals(getString(R.string.braun)) || bes.equals(getString(R.string.braunCode))){
-                return R.drawable.glass_brown; //braun
-            }
-        }
-        else if(pap.contains(bes) || papCode.contains(bes)){
-            return R.drawable.paper;
-        }
-        return -1;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent(this,MainActivity.class);
-                startActivity(intent);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
-    }
-
+    /**
+     * Um zu prüfen, ob der Ersteller einen höheren Rang hat, ist es nötig die Titelstufen in Zahlen umzuwandeln.
+     * @param titel
+     * @return
+     */
     public int getNumberTitel(String titel){
         if (titel.equals("Müllmonster")){
             return 1;
@@ -372,6 +401,25 @@ public class ErgebnisActivity extends AppCompatActivity {
             return 6;
         }
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(this,MainActivity.class);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
+    }
+
+
 
 
 }

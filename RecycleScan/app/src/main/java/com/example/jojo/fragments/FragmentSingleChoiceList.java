@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,10 +14,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jojo.recyclescan.ProgressStepsActivity;
+import com.example.jojo.recyclescan.R;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Die Hauptliste der Verpackungsbestandteile.
+ * Zuerst werden nur die Häufigsten Bestandteile angezeigt;
+ * bei Klick auf "Mehr Anzeigen" werden die restlichen Bestandteile aufgelistet.
+ */
 public class FragmentSingleChoiceList extends Fragment {
 
     View view;
@@ -85,8 +93,10 @@ public class FragmentSingleChoiceList extends Fragment {
         return view;
     }
 
+    /**
+     * ArrayList wird erneuert, wenn auf "Mehr Anzeigen" geklickt wird.
+     */
     private void updateData() {
-
         List<String> arrayErweitert = new ArrayList<>();
         arrayErweitert.addAll(arrayKurz1);
         arrayErweitert.addAll(arrayKurz2);

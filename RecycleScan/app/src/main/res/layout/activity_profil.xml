@@ -72,7 +72,7 @@
         app:layout_constraintBottom_toTopOf="@+id/progressPoints"
         app:layout_constraintEnd_toEndOf="@+id/progressPoints" />
 
-    <com.example.jojo.recyclescan.MyGridView
+    <com.example.jojo.helpers.MyGridView
         android:id="@+id/gridView"
         android:layout_width="0dp"
         android:layout_height="0dp"

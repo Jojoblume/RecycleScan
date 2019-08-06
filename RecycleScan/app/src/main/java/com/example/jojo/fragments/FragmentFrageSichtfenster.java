@@ -1,4 +1,4 @@
-package com.example.jojo.recyclescan;
+package com.example.jojo.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,7 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class FragmentFrageMehr extends Fragment {
+import com.example.jojo.recyclescan.ProgressStepsActivity;
+import com.example.jojo.recyclescan.R;
+
+/**
+ * Fragment, das angezeigt wird, nachdem Karton/Pappe/Papier ausgewählt wurde.
+ * Frage nach einem Plastik-Sichtfenster.
+ */
+public class FragmentFrageSichtfenster extends Fragment {
 
     View view;
 
@@ -19,7 +26,7 @@ public class FragmentFrageMehr extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_frage_mehr, container, false);
+        view = inflater.inflate(R.layout.fragment_frage_sichtfenster, container, false);
 
         ja = view.findViewById(R.id.buttonJa);
         nein = view.findViewById(R.id.buttonNein);
@@ -27,18 +34,18 @@ public class FragmentFrageMehr extends Fragment {
         ja.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ProgressStepsActivity)getActivity()).setCurrentState("MehrJa");
+                ((ProgressStepsActivity)getActivity()).addBestandteil(getString(R.string.Sichtfenster));
+                ((ProgressStepsActivity)getActivity()).setCurrentState(getString(R.string.Sichtfenster));
                 ((ProgressStepsActivity)getActivity()).getFragment();
-                /**getActivity().getSupportFragmentManager().beginTransaction()
-                 .replace(R.id.fragmentContainer, fragmentÜbersicht)
-                 .commit();**/
+
             }
         });
 
         nein.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ProgressStepsActivity)getActivity()).setCurrentState("ENDE");
+                ((ProgressStepsActivity)getActivity()).addBestandteil(getString(R.string.Karton));
+                ((ProgressStepsActivity)getActivity()).setCurrentState(getString(R.string.Karton));
                 ((ProgressStepsActivity)getActivity()).getFragment();
 
             }

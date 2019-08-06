@@ -14,7 +14,7 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/searchview_rounded"
         android:cursorVisible="false"
-        android:drawableLeft="@drawable/ic_search_blackinblack_24dp"
+        android:drawableLeft="@drawable/ic_search_for_edittext_24dp"
         android:drawablePadding="10dp"
         android:hint="Barcode eintippen"
         android:imeOptions="actionDone"
