@@ -74,7 +74,7 @@
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_check_white_24dp"
+        app:srcCompat="@drawable/ic_arrow_forward_white_24dp"
         tools:ignore="VectorDrawableCompat" />
 
 
