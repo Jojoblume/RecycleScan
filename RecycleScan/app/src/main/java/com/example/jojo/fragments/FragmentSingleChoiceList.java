@@ -80,8 +80,9 @@ public class FragmentSingleChoiceList extends Fragment {
                     //Bei Glas, Pappe und "Weiß nicht" soll Bestandteil nicht dem Array hinzugefügt werden.
                     //currentState ist zur Ermittlung, was ausgewählt wurde.
                     ((ProgressStepsActivity)getActivity()).setCurrentState(bestandteil);
-
+                    list1.setItemChecked(pos, false); //Damit beim 2. Anzeigen der ListView der vorherige Bestandteil nicht ausgewählt bleibt.
                     ((ProgressStepsActivity)getActivity()).getFragment();
+
                 }
                 else{
                     Toast.makeText(getActivity(), "Du weißt es nicht?", Toast.LENGTH_SHORT).show();

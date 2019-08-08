@@ -305,4 +305,9 @@ public static final String TAG = "MyActivity";
 
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
+
 }

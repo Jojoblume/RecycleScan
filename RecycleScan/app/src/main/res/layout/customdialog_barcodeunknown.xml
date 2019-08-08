@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/waschbar_neues_produkt" />
+        app:srcCompat="@drawable/waschbar" />
 
     <TextView
         android:id="@+id/textViewTitle"
