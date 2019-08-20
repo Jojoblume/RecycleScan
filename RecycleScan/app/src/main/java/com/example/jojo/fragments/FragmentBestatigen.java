@@ -45,7 +45,7 @@ public class FragmentBestatigen extends Fragment {
 
                 if (((ProgressStepsActivity)getActivity()).isNewUser() == false){
                     String userID = ((ProgressStepsActivity)getActivity()).getUserID();
-                    ((ProgressStepsActivity)getActivity()).saveOnFirebase(userID);
+                    ((ProgressStepsActivity)getActivity()).saveProductOnFirebase(userID);
                 } else {
                     ((ProgressStepsActivity)getActivity()).dialogNewUser();
                 }

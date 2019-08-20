@@ -386,7 +386,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         String benutzername = editTextBenutzername.getText().toString();
                         if (!benutzername.isEmpty()) {
-                            logIn(benutzername); //+saveUserOnFirebase //+ saveOnFirebase //+saveProduct To User
+                            logIn(benutzername); //+saveUserOnFirebase //+ saveProductOnFirebase //+saveProduct To User
                         } else {
                             Toast.makeText(ProgressStepsActivity.this, "Denk dir einen Namen aus", Toast.LENGTH_LONG).show();
                         }
@@ -444,7 +444,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
                 .set(user).addOnSuccessListener(this, new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                saveOnFirebase(userID);
+                saveProductOnFirebase(userID);
             }
         }).addOnFailureListener(ProgressStepsActivity.this, new OnFailureListener() {
             @Override
@@ -460,7 +460,7 @@ public class ProgressStepsActivity extends AppCompatActivity {
      * Wenn eingeloggter Nutzer: 1. Methode, die aufgerufen wird.
      * @param uid
      */
-    public void saveOnFirebase(final String uid) {
+    public void saveProductOnFirebase(final String uid) {
         progress.setVisibility(View.VISIBLE);
         Map<String, Object> product = new HashMap<>();
         product.put("Bezeichnung", bez);
